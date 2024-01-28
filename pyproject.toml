@@ -8,8 +8,29 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 discord-py = "^2.3.2"
+python-dotenv = "^1.0.0"
+pytest = "^7.4.4"
+requests = "^2.31.0"
+sqlalchemy-utils = "^0.41.1"
+sqlalchemy = "^2.0.25"
+psycopg2 = "^2.9.9"
+discord = "^2.3.2"
+alembic = "^1.13.1"
 
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.0.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint]
+disable = [
+  "R0903",  # Too few public methods
+  "R0913",  # Too many arguments
+  "W1203",  # Use lazy % formatting in logging funtions
+]
+
+[tool.pylint.report]
+output-format = "colorized"

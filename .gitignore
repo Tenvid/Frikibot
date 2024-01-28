@@ -1,0 +1,8 @@
+tests/
+__pycache__/
+
+Docker/.env
+.idea
+dist/
+.vscode
+*.ini

@@ -22,12 +22,12 @@ async def on_ready():
 # -hello
 @bot.command(name="hello", help="Says hello to user,")
 @commands.cooldown(1, 5, commands.BucketType.user)
-async def hello(ctx):
+async def hello(ctx: pokemon_generator.discord.ext.commands.Context):
     await ctx.send(f"Hola, {ctx.author.mention}!")
 
 
 @bot.command(name="test", help="test_command")
-async def test(ctx):
+async def test(ctx: pokemon_generator.discord.ext.commands.Context):
     await ctx.send("""
   ```ansi
 \u001b[0;31mAttack\u001b[0;0m
@@ -37,14 +37,14 @@ async def test(ctx):
 
 @commands.cooldown(1, 5, commands.BucketType.guild)
 @bot.command(name="pokemon", help="Generates a random Pokémon")
-async def pokemon(ctx):
+async def pokemon(ctx: pokemon_generator.discord.ext.commands.Context):
     embed, message = pokemon_generator.generate_random_pokemon(ctx)
 
     await ctx.send(message, embed=embed)
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx: pokemon_generator.discord.ext.commands.Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send(
             f" {ctx.author.mention} This command is actually on cooldown, you can use it in"

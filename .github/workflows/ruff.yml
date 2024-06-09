@@ -1,4 +1,4 @@
-name: Pylint
+name: Ruff
 
 on: 
   workflow_dispatch:

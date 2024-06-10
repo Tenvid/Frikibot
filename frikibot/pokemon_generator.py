@@ -75,6 +75,7 @@ def get_pokemon_stats(name: str) -> Dict[str, int]:
     """
 
     ret = {
+        "Hp": 0,
         "Attack": 0,
         "Defense": 0,
         "Special attack": 0,
@@ -92,11 +93,12 @@ def get_pokemon_stats(name: str) -> Dict[str, int]:
     for stat in stats:
         stat_values.append(stat["base_stat"])
 
-    ret["Attack"] = stat_values[0]
-    ret["Defense"] = stat_values[1]
-    ret["Special attack"] = stat_values[2]
-    ret["Special defense"] = stat_values[3]
-    ret["Speed"] = stat_values[4]
+    ret["Hp"] = stat_values[0]
+    ret["Attack"] = stat_values[1]
+    ret["Defense"] = stat_values[2]
+    ret["Special attack"] = stat_values[3]
+    ret["Special defense"] = stat_values[4]
+    ret["Speed"] = stat_values[5]
 
     logging.info(f"Stats: {ret}")
 

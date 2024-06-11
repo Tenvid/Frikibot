@@ -117,9 +117,12 @@ def get_moves_string(name: str) -> str:
     """
 
     moves = get_pokemon_moves(name)
-    ret = "```\n"
+    ret = "```"
     for move in moves:
-        ret += f"\n {move} "
+        ret += f"{move.strip()}"
+        if move == moves[-1]:
+            break
+        ret += "\n"
     ret += "```"
 
     logging.info(f"Moves: {moves}")
@@ -188,19 +191,6 @@ def correct_suffixes(name: str) -> str:
     return name
 
 
-def get_shiny_chance() -> str:
-    """Get a string to know if the Pokémon has to be shiny or normal
-
-    Returns:
-        str: Color value ['normal', 'shiny']
-    """
-
-    index = random.randint(1, 100)
-    if index <= 10:
-        return "shiny"
-    return "normal"
-
-
 def get_random_move(moves: str) -> str:
     """Get a random move from all the available
 
@@ -229,21 +219,17 @@ def get_pokemon_moves(name: str) -> List[str]:
     """
 
     ret = []
-    try:
-        name = name.replace("-gmax", "")
-        url = f"https://pokeapi.co/api/v2/pokemon/{name}"
-        response = requests.get(url)
-        jres = json.loads(response.text)
-        moves = jres["moves"]
-        while True:
-            move = get_random_move(moves)
-            if move not in ret:
-                ret.append(move)
-            if len(ret) > 3:
-                break
-    except IndexError:
-        # TODO: Handle this exception in upper levels
-        pass
+    name = name.replace("-gmax", "")
+    url = f"https://pokeapi.co/api/v2/pokemon/{name}"
+    response = requests.get(url)
+    jres = json.loads(response.text)
+    moves = jres["moves"]
+    while True:
+        move = get_random_move(moves)
+        if move not in ret:
+            ret.append(move)
+        if len(ret) > 3:
+            break
     return ret
 
 

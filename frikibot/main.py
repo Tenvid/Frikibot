@@ -1,8 +1,18 @@
-import os
-from dotenv import load_dotenv
-from discord.ext import commands
+"""
+Script made by David Gómez.
+
+This module contains the commands available in the Frikibot.
+"""
+
 import logging
-import pokemon_generator
+import os
+import typing
+
+from discord.ext import commands
+from dotenv import load_dotenv
+
+from frikibot import pokemon_generator
+from frikibot.database_handler import create_trainer, read_trainer
 
 load_dotenv()
 # Bot token obtained from the environment variable
@@ -15,42 +25,64 @@ logging.basicConfig(level="INFO", format="%(process)d-%(levelname)s-%(message)s"
 
 # Event realised when the bot is connected
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
+    """Print a log message when bot is connected."""
     print("Connected")
 
 
 # -hello
 @bot.command(name="hello", help="Says hello to user,")
 @commands.cooldown(1, 5, commands.BucketType.user)
-async def hello(ctx: pokemon_generator.discord.ext.commands.Context):
+async def hello(ctx: commands.Context[typing.Any]) -> None:
+    """
+    Greet user.
+
+    Args:
+    ----
+        ctx (commands.Context[typing.Any]): Command context
+
+    """
     await ctx.send(f"Hola, {ctx.author.mention}!")
-
-
-@bot.command(name="test", help="test_command")
-async def test(ctx: pokemon_generator.discord.ext.commands.Context):
-    await ctx.send("""
-  ```ansi
-\u001b[0;31mAttack\u001b[0;0m
-```
-""")
 
 
 @commands.cooldown(1, 5, commands.BucketType.guild)
 @bot.command(name="pokemon", help="Generates a random Pokémon")
-async def pokemon(ctx: pokemon_generator.discord.ext.commands.Context):
-    embed, message = pokemon_generator.generate_random_pokemon(ctx)
+async def pokemon(ctx: commands.Context[typing.Any]) -> None:
+    """
+    Generate random Pokémon.
 
+    Args:
+    ----
+        ctx (commands.Context): Command context
+
+    """
+    embed, message = pokemon_generator.generate_random_pokemon(ctx)
+    if not read_trainer(str(ctx.author.id)):
+        logging.info("Trainer added")
+        create_trainer(ctx.author.name, str(ctx.author.id))
     await ctx.send(message, embed=embed)
 
 
 @bot.event
-async def on_command_error(ctx: pokemon_generator.discord.ext.commands.Context, error):
+async def on_command_error(
+    ctx: commands.Context[typing.Any], error: commands.CommandError
+) -> None:
+    """
+    Tell the user that an error happened.
+
+    Args:
+    ----
+        ctx (commands.Context): Context of the command
+        error (commands.CommandError): Error of the command
+
+    """
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send(
-            f" {ctx.author.mention} This command is actually on cooldown, you can use it in"
+            f" {ctx.author.mention} This command is actually on cooldown, wait "
             f" {round(error.retry_after, 2)} seconds."
         )
 
 
 # Bot start
-bot.run(TOKEN)
+if TOKEN:
+    bot.run(TOKEN)

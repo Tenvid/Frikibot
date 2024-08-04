@@ -12,7 +12,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from frikibot import pokemon_generator
-from frikibot.database_handler import create_trainer, read_trainer
+from frikibot.database_handler import create_database, create_trainer, read_trainer
 
 load_dotenv()
 # Bot token obtained from the environment variable
@@ -82,6 +82,9 @@ async def on_command_error(
             f" {round(error.retry_after, 2)} seconds."
         )
 
+
+if __name__ == "__main__":
+    create_database()
 
 # Bot start
 if TOKEN:

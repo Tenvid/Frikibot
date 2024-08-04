@@ -207,3 +207,46 @@ INSERT INTO {POKEMON_TABLE} (
         )
         conn.commit()
         print("Pokemon inserted")
+
+
+def create_database():
+    """
+    Create tables for the database.
+
+    Raises
+    ------
+        NonExistingElementError: Rise if there is no DATABASE in .env
+
+    """
+    if not DATABASE:
+        raise NonExistingElementError()
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"""
+        CREATE TABLE {TRAINER_TABLE} (
+    trainer_ID   INTEGER PRIMARY KEY AUTOINCREMENT
+                         NOT NULL,
+    trainer_name TEXT    NOT NULL,
+    trainer_code TEXT    UNIQUE
+                         NOT NULL,
+    enabled      INTEGER NOT NULL
+                         REFERENCES enabled_state (value)
+);
+""")
+        cursor.execute(f"""
+        CREATE TABLE {POKEMON_TABLE} (
+    ID         INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT
+                       NOT NULL,
+    Name       TEXT    NOT NULL,
+    Tipo1      TEXT    NOT NULL,
+    Tipo2      TEXT,
+    Entrenador TEXT    NOT NULL
+                       REFERENCES entrenador (trainer_code),
+    Move1      TEXT    NOT NULL,
+    Move2      TEXT    NOT NULL,
+    Move3      TEXT    NOT NULL,
+    Move4      TEXT    NOT NULL,
+    Naturaleza TEXT    NOT NULL
+);
+""")
+        conn.commit()

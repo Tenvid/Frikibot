@@ -1,0 +1,25 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.11.9'
+            - name: Poetry setup
+              run: pip install poetry && poetry install --with dev
+            - name: Lint
+              run: poetry run ruff format . && poetry run ruff check --fix .
+            - name: Typing check
+              run: poetry run mypy --install-types --non-interactive .
+            - name: Test
+              run: poetry run pytest -v tests/

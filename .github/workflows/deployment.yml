@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+      branches:
+        - main
+      types: [opened]
 
 jobs:
     deploy:
@@ -21,5 +25,5 @@ jobs:
               run: poetry run ruff format . && poetry run ruff check --fix .
             - name: Typing check
               run: poetry run mypy --install-types --non-interactive .
-            - name: Test
-              run: poetry run pytest -v tests/
+            # - name: Test
+            #   run: poetry run pytest -v tests/

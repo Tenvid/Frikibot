@@ -222,7 +222,8 @@ def create_database():
         raise NonExistingElementError()
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
-        cursor.execute(f"""
+        try:
+            cursor.execute(f"""
         CREATE TABLE {TRAINER_TABLE} (
     trainer_ID   INTEGER PRIMARY KEY AUTOINCREMENT
                          NOT NULL,
@@ -233,7 +234,11 @@ def create_database():
                          REFERENCES enabled_state (value)
 );
 """)
-        cursor.execute(f"""
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cursor.execute(f"""
         CREATE TABLE {POKEMON_TABLE} (
     ID         INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT
                        NOT NULL,
@@ -249,4 +254,7 @@ def create_database():
     Naturaleza TEXT    NOT NULL
 );
 """)
+        except sqlite3.OperationalError:
+            pass
+
         conn.commit()

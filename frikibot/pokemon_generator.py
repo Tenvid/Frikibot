@@ -183,7 +183,9 @@ def eliminate_invalid_forms(varieties: list[dict[Any, Any]]) -> str:
 
 
 def correct_name(
-    name: str, varieties: list[dict[Any, Any]], variety: dict[Any, Any]
+    name: str,
+    varieties: list[dict[Any, Any]],
+    variety: dict[Any, Any],
 ) -> str:
     """
     Fix Pokémon names that cause error getting image url and re-format Pokémon name.
@@ -264,7 +266,7 @@ def get_random_move(moves: list[dict[Any, Any]]) -> str:
 
     """
     return str(
-        moves[randbelow(len(moves) - 1)]["move"]["name"].replace("-", " ").capitalize()
+        moves[randbelow(len(moves) - 1)]["move"]["name"].replace("-", " ").capitalize(),
     )
 
 
@@ -417,7 +419,9 @@ def get_nature() -> dict[Any, Any]:
 
     """
     natures = dict(
-        json.loads(requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).text)
+        json.loads(
+            requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).text,
+        ),
     )
 
     nature = pick_nature(natures)
@@ -487,7 +491,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         requests.get(
             f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
             timeout=TIMEOUT,
-        ).text
+        ).text,
     )
     varieties: list[Any] = json_response["varieties"]
 
@@ -503,7 +507,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
     ret.set_image(
         url=f"https://img.pokemondb.net/sprites/home/{color}/"
-        f"{correct_name(pokemon_name, varieties=varieties, variety=variety)}.png"
+        f"{correct_name(pokemon_name, varieties=varieties, variety=variety)}.png",
     )
 
     moves_string = get_moves_string(pokemon_name)
@@ -539,7 +543,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
             first_type=types[0]["type"]["name"] if types else "none",
             second_type=types[1]["type"]["name"] if types and len(types) > 1 else "none",
             author_code=str(ctx.author.id),
-        )
+        ),
     )
 
     return ret

@@ -65,7 +65,8 @@ async def pokemon(ctx: commands.Context[typing.Any]) -> None:
 
 @bot.event
 async def on_command_error(
-    ctx: commands.Context[typing.Any], error: commands.CommandError
+    ctx: commands.Context[typing.Any],
+    error: commands.CommandError,
 ) -> None:
     """
     Tell the user that an error happened.
@@ -79,7 +80,7 @@ async def on_command_error(
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send(
             f" {ctx.author.mention} This command is actually on cooldown, wait "
-            f" {round(error.retry_after, 2)} seconds."
+            f" {round(error.retry_after, 2)} seconds.",
         )
 
 

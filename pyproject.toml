@@ -55,9 +55,18 @@ select = [
     "S",
     "BLE",
     "FBT",
-] # Only rules before (B) have been added for the moment
+    "B",
+    "A", # Keywords shadowing
+    "COM", # Trailing commas
+    "C4", # List comprehensions
+    "DTZ", # Datetime
+    "ISC", # Implicit string concatenation
+    "ICN", # Import conventions
+] # Only rules before (ICN) have been added for the moment
 
 ignore = [
     "D203", # Empty line between class declaration and docstring
     "D212", # Docstring summary in first line
+    "ICN003", # Prohibit 'from' in import
+    "COM812", # Conflict with ISC001 | Checks for absensce of trailing comma
 ]

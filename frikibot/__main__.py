@@ -12,7 +12,13 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from frikibot import pokemon_generator
-from frikibot.database_handler import create_database, create_trainer, read_trainer
+from frikibot.database_handler import (
+    create_database,
+    create_trainer,
+    read_pokemon_by_trainer,
+    read_trainer,
+)
+from frikibot.paginated_view import PaginatedView
 
 load_dotenv()
 # Bot token obtained from the environment variable
@@ -30,8 +36,7 @@ async def on_ready() -> None:
     print("Connected")
 
 
-# -hello
-@bot.command(name="hello", help="Says hello to user,")
+@bot.command(name="hello", help="Says hello to the user")  # type: ignore
 @commands.cooldown(1, 5, commands.BucketType.user)
 async def hello(ctx: commands.Context[typing.Any]) -> None:
     """
@@ -45,9 +50,11 @@ async def hello(ctx: commands.Context[typing.Any]) -> None:
     await ctx.send(f"Hola, {ctx.author.mention}!")
 
 
-@commands.cooldown(1, 5, commands.BucketType.guild)
+@commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
 @bot.command(name="pokemon", help="Generates a random Pokémon")
-async def pokemon(ctx: commands.Context[typing.Any]) -> None:
+async def pokemon(
+    ctx: commands.Context[typing.Any],
+) -> None:
     """
     Generate random Pokémon.
 
@@ -61,6 +68,25 @@ async def pokemon(ctx: commands.Context[typing.Any]) -> None:
         logging.info("Trainer added")
         create_trainer(ctx.author.name, str(ctx.author.id))
     await ctx.send(message, embed=embed)
+
+
+@commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
+@bot.command(
+    name="dex", help="List all Pokémon from user and show them in a paginated view"
+)
+async def dex(ctx: commands.Context[typing.Any]) -> None:
+    """
+    List all Pokémon from user and show them in a paginated view.
+
+    Args:
+    ----
+        ctx (commands.Context[typing.Any]): Message context
+
+    """
+    view = PaginatedView()
+    view.data = read_pokemon_by_trainer(str(ctx.author.id))
+    view.user = ctx.author.name
+    await view.send(ctx)
 
 
 @bot.event

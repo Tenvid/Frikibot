@@ -537,7 +537,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     create_pokemon(
         Pokemon(
             name=pokemon_name,
-            pokedex_number=pokemon_index,
+            list_index=pokemon_index,
             moves_list=moves_string.replace("```", "").split("\n"),
             nature=nature["name"],
             first_type=types[0]["type"]["name"] if types else "none",

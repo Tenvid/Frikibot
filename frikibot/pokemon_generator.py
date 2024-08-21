@@ -376,35 +376,14 @@ def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
         decreased = None
         increased = None
 
-    logging.info(f"Decreased stat: {decreased}")
-    logging.info(f"Increased stat: {increased}")
+    logger.info(f"Decreased stat: {decreased}")
+    logger.info(f"Increased stat: {increased}")
 
     if decreased is not None and increased is not None:
         decreased = decreased.capitalize()
         increased = increased.capitalize()
-        logging.info(f"Modified stats: +{increased} -{decreased}")
 
     return decreased, increased
-
-
-def load_pokemon(response: requests.Response) -> dict[Any, Any]:
-    """
-    Serialize response plain text to a dict.
-
-    Args:
-    ----
-        response (requests.Response): Response from HTTP request
-
-    Returns:
-    -------
-        Dict: Response as dict
-
-    """
-    poke = dict(json.loads(response.text))
-
-    logging.info(msg=f"\nPokemon response: {poke['name']}")
-
-    return poke
 
 
 def get_nature() -> dict[Any, Any]:

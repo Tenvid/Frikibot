@@ -25,7 +25,8 @@ MAX_INDEX = 1010
 
 TIMEOUT = 10
 
-logger = logging.Logger(name="logger", level=0)
+logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
+logger = logging.getLogger(name="PkGenerator")
 
 
 NAME_REPLACEMENTS = {
@@ -53,8 +54,6 @@ def get_stats_string(name: str, decreased: str | None, increased: str | None) ->
 
     """
     stats = get_pokemon_stats(name)
-
-    logging.info("Stats generated")
 
     ret = "```ansi\n"
 
@@ -127,7 +126,7 @@ def get_pokemon_stats(name: str) -> dict[str, int]:
 
     ret["Speed"] = stat_values[5]
 
-    logging.info(f"Stats: {ret}")
+    logger.info(f"Stats: {ret}")
 
     return ret
 
@@ -157,8 +156,7 @@ def get_moves_string(name: str) -> str:
 
     ret += "```"
 
-    logging.info(f"Moves: {moves}")
-    logging.info(f"{ret}")
+    logger.info(f"Moves: {', '.join(moves)}")
     return ret
 
 
@@ -426,7 +424,7 @@ def get_nature() -> dict[Any, Any]:
 
     nature = pick_nature(natures)
 
-    logging.info(f"Nature: {nature['name']}")
+    logger.info(f"Nature: {nature['name']}")
     return nature
 
 
@@ -467,7 +465,7 @@ def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | No
         return list[dict[Any, Any]](json.loads(text_response)["types"])
 
     except KeyError:
-        logging.error("Types could not get obtained")
+        logger.error("Types could not be obtained.")
         return None
 
 
@@ -528,10 +526,6 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         f"# {pokemon_index} *{nature['name'].capitalize()}* {pokemon_name.capitalize()}"
     )
 
-    logger.info(msg="Embed title set")
-
-    logging.info("Embed built")
-
     types = generate_pokemon_types(variety)
 
     create_pokemon(
@@ -545,5 +539,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
             author_code=str(ctx.author.id),
         ),
     )
+
+    logger.info(msg="Embed title set")
 
     return ret

@@ -26,7 +26,9 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 # Bot instance
 bot = pokemon_generator.bot
 
-logging.basicConfig(level="INFO", format="%(process)d-%(levelname)s-%(message)s")
+logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
+
+logger = logging.getLogger("main")
 
 
 # Event realised when the bot is connected
@@ -65,7 +67,7 @@ async def pokemon(
     """
     embed, message = pokemon_generator.generate_random_pokemon(ctx)
     if not read_trainer(str(ctx.author.id)):
-        logging.info("Trainer added")
+        logger.info("Trainer added")
         create_trainer(ctx.author.name, str(ctx.author.id))
     await ctx.send(message, embed=embed)
 

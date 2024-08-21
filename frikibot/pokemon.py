@@ -52,7 +52,7 @@ class Pokemon:
 
         Returns:
         -------
-            _type_: _description_
+            Pokemon: Pokemon instance
 
         """
         return cls(

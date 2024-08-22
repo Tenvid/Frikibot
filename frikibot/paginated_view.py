@@ -1,4 +1,8 @@
-"""WIP."""
+"""
+Script made by David Gómez.
+
+This module defines Paginated View for Discord Message.
+"""
 
 import math
 import typing

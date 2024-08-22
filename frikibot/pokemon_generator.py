@@ -16,6 +16,7 @@ from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
 from frikibot.pokemon import Pokemon
+from frikibot.stats import Stats
 
 bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
@@ -28,7 +29,6 @@ TIMEOUT = 10
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 logger = logging.getLogger(name="PkGenerator")
 
-
 NAME_REPLACEMENTS = {
     "gmax": "gigantamax",
     "alola": "alolan",
@@ -38,13 +38,15 @@ NAME_REPLACEMENTS = {
 }
 
 
-def get_stats_string(name: str, decreased: str | None, increased: str | None) -> str:
+def get_stats_string(
+    pokemon_name: str, decreased: str | None, increased: str | None
+) -> str:
     """
     Return the ansi string of the stats of the Pokémon.
 
     Args:
     ----
-        name (str): Name of the Pokémon
+        pokemon_name (str): Name of the Pokémon
         decreased (str): Decreased stat
         increased (str): Increased stat
 
@@ -53,82 +55,49 @@ def get_stats_string(name: str, decreased: str | None, increased: str | None) ->
         str: String of the stats in ansi format
 
     """
-    stats = get_pokemon_stats(name)
+    stats = get_pokemon_stats(pokemon_name, decreased, increased)
 
-    ret = "```ansi\n"
-
-    if decreased is None and increased is None:
-        # Neutral nature -> No color in texts
-        for stat in stats:
-            actual_stat = stats[stat]
-
-            ret += f"{stat}: {actual_stat}\n"
-
-    else:
-        # Non-neutral nature -> Red to increased, Blue to decreased
-        for stat in stats:
-            actual_stat = stats[stat]
-
-            if stat == decreased:
-                ret += f"\u001b[0;34m{stat}: {actual_stat} -\u001b[0;0m\n"
-
-            elif stat == increased:
-                ret += f"\u001b[0;31m{stat}: {actual_stat} +\u001b[0;0m\n"
-            else:
-                ret += f"{stat}: {actual_stat}\n"
-
-    ret += "```"
-    return ret
+    return "```ansi\n" + str(stats) + "```"
 
 
-def get_pokemon_stats(name: str) -> dict[str, int]:
+def get_pokemon_stats(
+    name: str, decreased_stat: str | None, increased_stat: str | None
+) -> Stats:
     """
     Get the stats of the Pokémon and return it in a dict.
 
     Args:
     ----
         name (str): Name of the Pokémon
+        decreased_stat (str): Name of the stat whose value is decreased by nature
+        increased_stat (str): Name of the stat whose value is increased by nature
 
     Returns:
     -------
-        Dict[str, int]: Stats of the pokemon
+        Stats: Stats of the pokemon
 
     """
-    ret = {
-        "Hp": 0,
-        "Attack": 0,
-        "Defense": 0,
-        "Special attack": 0,
-        "Special defense": 0,
-        "Speed": 0,
-    }
-
-    response_bis = requests.get(
+    pokemon_data_response = requests.get(
         f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
         timeout=TIMEOUT,
     )
 
-    stats = json.loads(response_bis.text)["stats"]
+    stats = json.loads(pokemon_data_response.text)["stats"]
 
     stat_values = []
     for stat in stats:
         stat_values.append(stat["base_stat"])
 
-    ret["Hp"] = stat_values[0]
-
-    ret["Attack"] = stat_values[1]
-
-    ret["Defense"] = stat_values[2]
-
-    ret["Special attack"] = stat_values[3]
-
-    ret["Special defense"] = stat_values[4]
-
-    ret["Speed"] = stat_values[5]
-
-    logger.info(f"Stats: {ret}")
-
-    return ret
+    return Stats(
+        stat_values[0],
+        stat_values[1],
+        stat_values[2],
+        stat_values[3],
+        stat_values[4],
+        stat_values[5],
+        decreased_stat,
+        increased_stat,
+    )
 
 
 def get_moves_string(name: str) -> str:
@@ -369,8 +338,8 @@ def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
 
     """
     try:
-        decreased = nature["decreased_stat"]["name"].replace("-", " ")
-        increased = nature["increased_stat"]["name"].replace("-", " ")
+        decreased = nature["decreased_stat"]["name"]
+        increased = nature["increased_stat"]["name"]
 
     except TypeError:
         decreased = None
@@ -378,10 +347,6 @@ def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
 
     logger.info(f"Decreased stat: {decreased}")
     logger.info(f"Increased stat: {increased}")
-
-    if decreased is not None and increased is not None:
-        decreased = decreased.capitalize()
-        increased = increased.capitalize()
 
     return decreased, increased
 

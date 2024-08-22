@@ -1,5 +1,5 @@
 from unittest.mock import Mock, MagicMock, patch
-import pokemon_generator
+import frikibot.pokemon_generator
 import random
 
 

@@ -7,22 +7,73 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+python-dotenv = "1.0.1"
+requests = "2.32.2"
+types-requests = "2.32.0.20240712"
 discord-py = "2.3.2"
-python-dotenv = "1.0.0"
-requests = "2.31.0"
-types-requests = "^2.32.0.20240602"
-pre-commit = "3.7.1"
+
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.4.8"
+ruff = "0.4.8"
+mypy = "1.11.0"
+discord-py = "2.3.2"
 pytest = "^8.2.2"
+pre-commit = "3.8.0"
 coverage = "7.5.3"
-mypy = "^1.10.0"
 ipython = "^8.25.0"
+
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 90
+indent-width = 4
+exclude = ["tests",]
+target-version = "py311"
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "D",
+    "W2",
+    "W391",
+    "W505",
+    "I",
+    "N",
+    "UP006",
+    "UP007",
+    "UP008",
+    "UP015",
+    "UP027",
+    "UP032",
+    "UP035",
+    "UP037",
+    "UP039",
+    "UP042",
+    "S",
+    "BLE",
+    "FBT",
+    "B",
+    "A", # Keywords shadowing
+    "COM", # Trailing commas
+    "C4", # List comprehensions
+    "DTZ", # Datetime
+    "ISC", # Implicit string concatenation
+    "ICN", # Import conventions
+] # Only rules before (ICN) have been added for the moment
+
+ignore = [
+    "D203", # Empty line between class declaration and docstring
+    "D212", # Docstring summary in first line
+    "ICN003", # Prohibit 'from' in import
+    "COM812", # Conflict with ISC001 | Checks for absensce of trailing comma
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["frikibot"]

@@ -8,3 +8,4 @@ repos:
     hooks:
       - id: vulture
         args: [frikibot, --min-confidence=100]
+        

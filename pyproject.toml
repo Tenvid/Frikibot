@@ -21,6 +21,7 @@ pytest = "^8.2.2"
 pre-commit = "3.8.0"
 coverage = "7.5.3"
 ipython = "^8.25.0"
+vulture = "^2.11"
 
 
 [build-system]

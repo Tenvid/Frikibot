@@ -233,7 +233,7 @@ def get_random_move(moves: list[dict[Any, Any]]) -> str:
 
     """
     return str(
-        moves[randbelow(len(moves) - 1)]["move"]["name"].replace("-", " ").capitalize(),
+        moves[randbelow(len(moves))]["move"]["name"].replace("-", " ").capitalize(),
     )
 
 
@@ -250,7 +250,7 @@ def get_pokemon_moves(name: str) -> list[str]:
         List[str]: List of Pokémon moves
 
     """
-    ret = []
+    ret: list = []
 
     try:
         name = name.replace("-gmax", "")
@@ -263,14 +263,11 @@ def get_pokemon_moves(name: str) -> list[str]:
 
         moves = jres["moves"]
 
-        while True:
+        while len(ret) < 4:
             move = get_random_move(moves)
 
             if move not in ret:
                 ret.append(move)
-
-            if len(ret) > 3:
-                break
 
     except IndexError:
         # TODO: Handle this exception in upper levels
@@ -429,12 +426,11 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-    json_response = json.loads(
-        requests.get(
-            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-            timeout=TIMEOUT,
-        ).text,
-    )
+    json_response = requests.get(
+        f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+        timeout=TIMEOUT,
+    ).json()
+
     varieties: list[Any] = json_response["varieties"]
 
     variety = varieties[randbelow(len(varieties))]

@@ -137,25 +137,6 @@ def test_correct_name_minior_core():
         == "minior-example-core"
     )
 
-
-@patch("frikibot.pokemon_generator.randbelow")
-def test_get_shiny_chance_shiny(mock_random):
-    for i in range(10):
-        mock_random.return_value = i
-
-        colour = pokemon_generator.get_shiny_chance()
-        assert colour == "shiny"
-
-
-@patch("frikibot.pokemon_generator.randbelow")
-def test_get_shiny_chance_not_shiny(mock_random):
-    for i in range(11, 101):
-        mock_random.return_value = i
-
-        colour = pokemon_generator.get_shiny_chance()
-        assert colour == "normal"
-
-
 def test_get_random_move():
     move_list = [{"move": {"name": "my-move"}}]
 

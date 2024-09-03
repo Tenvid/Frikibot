@@ -20,8 +20,6 @@ from frikibot.stats import Stats
 
 bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
-MIN_INDEX = 1
-
 MAX_INDEX = 1010
 
 TIMEOUT = 10
@@ -201,22 +199,6 @@ def correct_suffixes(name: str) -> str:
         name = name.replace(rep, NAME_REPLACEMENTS[rep])
 
     return name
-
-
-def get_shiny_chance() -> str:
-    """
-    Get a string to know if the Pokémon has to be shiny or normal.
-
-    Returns
-    -------
-        str: Color value ['normal', 'shiny']
-
-    """
-    index = randbelow(100)
-
-    if index <= 10:
-        return "shiny"
-    return "normal"
 
 
 def get_random_move(moves: list[dict[Any, Any]]) -> str:
@@ -426,10 +408,12 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-    json_response = requests.get(
-        f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-        timeout=TIMEOUT,
-    ).json()
+    json_response = json.loads(
+        requests.get(
+            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+            timeout=TIMEOUT,
+        ).text
+    )
 
     varieties: list[Any] = json_response["varieties"]
 

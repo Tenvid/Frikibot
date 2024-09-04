@@ -37,7 +37,7 @@ NAME_REPLACEMENTS = {
 
 
 def get_stats_string(
-    pokemon_name: str, decreased: str | None, increased: str | None
+    pokemon_name: str, modified_stats: tuple[str | None, str | None]
 ) -> str:
     """
     Return the ansi string of the stats of the Pokémon.
@@ -45,22 +45,19 @@ def get_stats_string(
     Args:
     ----
         pokemon_name (str): Name of the Pokémon
-        decreased (str): Decreased stat
-        increased (str): Increased stat
+        modified_stats (tuple[str | None, str | None]): Tuple with modified stats names
 
     Returns:
     -------
         str: String of the stats in ansi format
 
     """
-    stats = get_pokemon_stats(pokemon_name, decreased, increased)
+    stats = get_pokemon_stats(pokemon_name, modified_stats)
 
     return "```ansi\n" + str(stats) + "```"
 
 
-def get_pokemon_stats(
-    name: str, decreased_stat: str | None, increased_stat: str | None
-) -> Stats:
+def get_pokemon_stats(name: str, modified_stats: tuple[str | None, str | None]) -> Stats:
     """
     Get the stats of the Pokémon and return it in a dict.
 
@@ -68,19 +65,20 @@ def get_pokemon_stats(
     ----
         name (str): Name of the Pokémon
         decreased_stat (str): Name of the stat whose value is decreased by nature
-        increased_stat (str): Name of the stat whose value is increased by nature
+        modified_stats (tuple[str | None, str | None]): Tuple with modified stats names
+
 
     Returns:
     -------
         Stats: Stats of the pokemon
 
     """
-    pokemon_data_response = requests.get(
-        f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
-        timeout=TIMEOUT,
-    )
-
-    stats = json.loads(pokemon_data_response.text)["stats"]
+    stats = json.loads(
+        requests.get(
+            f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
+            timeout=TIMEOUT,
+        ).text
+    )["stats"]
 
     stat_values = []
     for stat in stats:
@@ -93,8 +91,8 @@ def get_pokemon_stats(
         stat_values[3],
         stat_values[4],
         stat_values[5],
-        decreased_stat,
-        increased_stat,
+        modified_stats[0],
+        modified_stats[1],
     )
 
 
@@ -408,14 +406,12 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-    json_response = json.loads(
+    varieties: list[Any] = json.loads(
         requests.get(
             f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
             timeout=TIMEOUT,
         ).text
-    )
-
-    varieties: list[Any] = json_response["varieties"]
+    )["varieties"]
 
     variety = varieties[randbelow(len(varieties))]
 
@@ -423,31 +419,23 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
     nature = get_nature()
 
-    decreased, increased = get_changed_stats(nature)
-
-    ret = discord.Embed()
-
-    ret.set_image(
-        url=f"https://img.pokemondb.net/sprites/home/{color}/"
-        f"{correct_name(pokemon_name, varieties=varieties, variety=variety)}.png",
-    )
-
     moves_string = get_moves_string(pokemon_name)
 
-    # Pokemon Moves
+    stats_string = (
+        "```ansi\n"
+        + str(get_pokemon_stats(pokemon_name, get_changed_stats(nature)))
+        + "```"
+    )
 
-    ret.add_field(name="Moves", value=moves_string)
-
-    stats_string = get_stats_string(pokemon_name, decreased, increased)
-
-    # Pokemon Stats
-
-    ret.add_field(name="Stats", value=stats_string)
-
-    # Pokémon name
-
-    ret.title = (
-        f"# {pokemon_index} *{nature['name'].capitalize()}* {pokemon_name.capitalize()}"
+    ret = _generate_embed(
+        color,
+        pokemon_index,
+        varieties,
+        variety,
+        pokemon_name,
+        nature,
+        moves_string,
+        stats_string,
     )
 
     types = generate_pokemon_types(variety)
@@ -465,5 +453,39 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     )
 
     logger.info(msg="Embed title set")
+
+    return ret
+
+
+def _generate_embed(
+    color,
+    pokemon_index,
+    varieties,
+    variety,
+    pokemon_name,
+    nature,
+    moves_string,
+    stats_string,
+):
+    ret = discord.Embed()
+
+    ret.set_image(
+        url=f"https://img.pokemondb.net/sprites/home/{color}/"
+        f"{correct_name(pokemon_name, varieties=varieties, variety=variety)}.png",
+    )
+
+    # Pokemon Moves
+
+    ret.add_field(name="Moves", value=moves_string)
+
+    # Pokemon Stats
+
+    ret.add_field(name="Stats", value=stats_string)
+
+    # Pokémon name
+
+    ret.title = (
+        f"# {pokemon_index} *{nature['name'].capitalize()}* {pokemon_name.capitalize()}"
+    )
 
     return ret

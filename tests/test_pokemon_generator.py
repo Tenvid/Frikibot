@@ -7,7 +7,7 @@ from frikibot.stats import Stats
 @patch("frikibot.pokemon_generator.get_pokemon_stats")
 def test_get_stats_string_with_neutral_nature(mock_stats):
     mock_stats.return_value = Stats(0, 0, 0, 0, 0, 0, None, None)
-    stats_string = pokemon_generator.get_stats_string("", None, None)
+    stats_string = pokemon_generator.get_stats_string("", (None, None))
 
     assert isinstance(stats_string, str)
     assert (
@@ -26,7 +26,7 @@ Speed: 0```"""
 def test_get_stats_string_with_non_neutral_nature(mock_stats):
     mock_stats.return_value = Stats(0, 0, 0, 0, 0, 0, "special-attack", "defense")
 
-    stats_string = pokemon_generator.get_stats_string("", "special-attack", "defense")
+    stats_string = pokemon_generator.get_stats_string("", ("special-attack", "defense"))
 
     assert isinstance(stats_string, str)
     assert (
@@ -65,7 +65,7 @@ def test_get_pokemon_stats(mock_get):
     }]
     }"""
 
-    stats = pokemon_generator.get_pokemon_stats("lucario", None, None)
+    stats = pokemon_generator.get_pokemon_stats("lucario", (None, None))
     assert type(stats) is Stats
     assert stats.hp == 70
     assert stats.attack == 110

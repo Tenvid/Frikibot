@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import requests
+
 from frikibot import pokemon_generator
 from frikibot.stats import Stats
 
@@ -234,18 +236,19 @@ def test_build_embed(
         "varieties": [
             {
                 "pokemon": {
-                    "name": "Pokexample"
+                    "name": "Pokemon-example"
                 }
             }
         ]
     }
     """
 
-    mock_nature.return_value = {
-        "name": "pokemon_nature",
-        "decreased_stat": None,
-        "increased_stat": None,
-    }
+    # mock_nature.return_value = {
+    #     "name": "pokemon_nature",
+    #     "decreased_stat": None,
+    #     "increased_stat": None,
+    # }
+    mock_nature.return_value = None
 
     mock_name.return_value = "pokemon_name"
 
@@ -256,6 +259,9 @@ def test_build_embed(
     mock_types.return_value = [{"type": {"name": "type1"}}, {"type": {"name": "type2"}}]
 
     embed = pokemon_generator.build_embed("normal", mock_context)
+
+    if not embed:
+        assert False
 
     mock_create_pokemon.assert_called_once()
 
@@ -282,7 +288,7 @@ Special defense: 0
 Speed: 0```"""
     )
 
-    assert embed.title == f"# 1 *Pokemon_nature* Pokexample"
+    assert embed.title == f"# 1 *Hardy* Pokemon-example"
     assert (
         embed.image.url
         == "https://img.pokemondb.net/sprites/home/normal/pokemon_name.png"
@@ -356,3 +362,9 @@ def test_generate_pokemon_types_key_error(mock_get):
     foo = pokemon_generator.generate_pokemon_types(dict())
 
     assert foo is None
+
+@patch("requests.get")
+def test_get_nature_returns_null_if_there_is_connection_error(mock_get):
+    mock_get.side_effect = requests.ConnectionError
+
+    assert pokemon_generator.get_nature() == None

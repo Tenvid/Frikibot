@@ -239,9 +239,9 @@ def get_pokemon_moves(name: str) -> list[str]:
 
         response = requests.get(url, timeout=TIMEOUT)
 
-        jres = json.loads(response.text)
+        json_response = json.loads(response.text)
 
-        moves = jres["moves"]
+        moves = json_response["moves"]
 
         while len(ret) < 4:
             move = get_random_move(moves)
@@ -279,13 +279,13 @@ def generate_random_pokemon(
     return embed, message
 
 
-def get_message(colour: str, ctx: commands.Context[Any]) -> str:
+def get_message(color: str, ctx: commands.Context[Any]) -> str:
     """
     Return Discord message content depending if Pokémon is shiny or not.
 
     Args:
     ----
-        colour (str): Pokémon color ['normal', 'shiny']
+        color (str): Pokémon color ['normal', 'shiny']
         ctx (commands.Context): Discord command context
 
     Returns:
@@ -295,12 +295,12 @@ def get_message(colour: str, ctx: commands.Context[Any]) -> str:
     """
     message = f"{ctx.author.mention} Here you have your Pokémon"
 
-    if colour == "shiny":
+    if color == "shiny":
         message = message.replace("Pokémon", "✨SHINY✨ Pokémon")
     return message
 
 
-def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
+def get_changed_stats(nature: dict[Any, Any] | None) -> tuple[str | None, str | None]:
     """
     Get two stats which are modified by selected nature.
 
@@ -314,11 +314,15 @@ def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
             None if neutral nature
 
     """
-    try:
-        decreased = nature["decreased_stat"]["name"]
-        increased = nature["increased_stat"]["name"]
-
-    except TypeError:
+    if nature:
+        try:
+            decreased = nature["decreased_stat"]["name"]
+            increased = nature["increased_stat"]["name"]
+        except TypeError:
+            decreased = None
+            increased = None
+    else:
+        logger.info("Nature is none, so stats will not be modified")
         decreased = None
         increased = None
 
@@ -328,7 +332,7 @@ def get_changed_stats(nature: dict[Any, Any]) -> tuple[str | None, str | None]:
     return decreased, increased
 
 
-def get_nature() -> dict[Any, Any]:
+def get_nature() -> dict[Any, Any] | None:
     """
     Get a random nature.
 
@@ -337,11 +341,15 @@ def get_nature() -> dict[Any, Any]:
         Dict: Nature object
 
     """
-    natures = dict(
-        json.loads(
-            requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).text,
-        ),
-    )
+    try:
+        natures = dict(
+            json.loads(
+                requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).text,
+            ),
+        )
+    except requests.ConnectionError:
+        logger.error("Error trying to get natures list")
+        return None
 
     nature = pick_nature(natures)
 
@@ -401,17 +409,21 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
     Returns:
     -------
-        discord.Embed: Formatted embed object
+        discord.Embed | None: Formatted embed object
 
     """
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-    varieties: list[Any] = json.loads(
-        requests.get(
-            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-            timeout=TIMEOUT,
-        ).text
-    )["varieties"]
+    try:
+        varieties: list[Any] = json.loads(
+            requests.get(
+                f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+                timeout=TIMEOUT,
+            ).text
+        )["varieties"]
+    except requests.ConnectionError:
+        logger.error("Timeout exception trying to get Pokémon varieties")
+        return discord.Embed(title="Error generating Pokémon data")
 
     variety = varieties[randbelow(len(varieties))]
 
@@ -427,7 +439,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         + "```"
     )
 
-    ret = _generate_embed(
+    embed = _generate_embed(
         color,
         pokemon_index,
         varieties,
@@ -445,7 +457,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
             name=pokemon_name,
             list_index=pokemon_index,
             moves_list=moves_string.replace("```", "").split("\n"),
-            nature=nature["name"],
+            nature=nature["name"] if nature else "None",
             first_type=types[0]["type"]["name"] if types else "none",
             second_type=types[1]["type"]["name"] if types and len(types) > 1 else "none",
             author_code=str(ctx.author.id),
@@ -454,7 +466,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
     logger.info(msg="Embed title set")
 
-    return ret
+    return embed
 
 
 def _generate_embed(
@@ -485,7 +497,8 @@ def _generate_embed(
     # Pokémon name
 
     ret.title = (
-        f"# {pokemon_index} *{nature['name'].capitalize()}* {pokemon_name.capitalize()}"
+        f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}*"
+        f" {pokemon_name.capitalize()}"
     )
 
     return ret

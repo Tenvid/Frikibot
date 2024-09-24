@@ -67,7 +67,7 @@ class Stats:
 
     def add_color_nature(self, stat_tuple: tuple[str, int]) -> str:
         """
-        Add colour to stats modified by nature.
+        Add color to stats modified by nature.
 
         Args:
         ----

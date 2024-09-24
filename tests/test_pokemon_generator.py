@@ -45,8 +45,7 @@ Speed: 0```"""
 
 @patch("requests.get")
 def test_get_pokemon_stats(mock_get):
-    mock_get.return_value.text = """
-    {"stats": [
+    mock_get.return_value.json.return_value ={"stats": [
     {
       "base_stat": 70
     },
@@ -65,7 +64,8 @@ def test_get_pokemon_stats(mock_get):
     {
       "base_stat": 90
     }]
-    }"""
+    }
+    
 
     stats = pokemon_generator.get_pokemon_stats("lucario", (None, None))
     assert type(stats) is Stats
@@ -149,8 +149,7 @@ def test_get_random_move():
 
 @patch("requests.get")
 def test_get_pokemon_moves(mock_get):
-    mock_get.return_value.text = """
-    {
+    mock_get.return_value.json.return_value =    {
       "moves" : [
         {
           "move" : {
@@ -174,7 +173,6 @@ def test_get_pokemon_moves(mock_get):
         }
       ]
     }
-    """
 
     moves_list = ["Move1", "Move2", "Move3", "Move4"]
 
@@ -182,16 +180,6 @@ def test_get_pokemon_moves(mock_get):
 
     for move in moves_list:
         assert move in moves
-
-
-@patch("requests.get")
-def test_get_pokemon_moves_index_error(
-    mock_get,
-):  # TODO: Make test more realistic (requests.get cannot raise IndexError)
-    mock_get.side_effect = IndexError
-
-    foo = pokemon_generator.get_pokemon_moves("foo")
-    assert not foo
 
 
 @patch("frikibot.pokemon_generator.get_message")
@@ -231,8 +219,7 @@ def test_build_embed(
 
     mock_randbelow.return_value = 0
 
-    mock_get.return_value.text = """
-    {
+    mock_get.return_value.json.return_value =     {
         "varieties": [
             {
                 "pokemon": {
@@ -241,13 +228,7 @@ def test_build_embed(
             }
         ]
     }
-    """
 
-    # mock_nature.return_value = {
-    #     "name": "pokemon_nature",
-    #     "decreased_stat": None,
-    #     "increased_stat": None,
-    # }
     mock_nature.return_value = None
 
     mock_name.return_value = "pokemon_name"
@@ -335,7 +316,7 @@ def test_pick_nature(mock_get):
         "results": [{"name": "hardy", "url": "https://pokeapi.co/api/v2/nature/1/"}]
     }
 
-    mock_get.return_value.text = '{"name": "hardy"}'
+    mock_get.return_value.json.return_value = {"name": "hardy"}
 
     nature = pokemon_generator.pick_nature(natures)
     assert nature["name"] == "hardy"
@@ -343,13 +324,13 @@ def test_pick_nature(mock_get):
 
 @patch("requests.get")
 def test_generate_pokemon_types(mock_get):
-    mock_get.return_value.text = """{
+    mock_get.return_value.json.return_value = {
     "types": [
             {"type": {"name": "fire"}},
             {"type": {"name": "water"}}
         ]
         }
-    """
+
     types = pokemon_generator.generate_pokemon_types({"pokemon": {"url": ""}})
     assert types[0]["type"]["name"] == "fire" or "water"
     assert types[1]["type"]["name"] == "fire" or "water"

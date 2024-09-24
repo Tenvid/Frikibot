@@ -5,7 +5,6 @@ This module makes a request to PokeAPI and uses its info to generate
 a random Pokémon.
 """
 
-import json
 import logging
 from secrets import randbelow
 from typing import Any
@@ -73,12 +72,10 @@ def get_pokemon_stats(name: str, modified_stats: tuple[str | None, str | None]) 
         Stats: Stats of the pokemon
 
     """
-    stats = json.loads(
-        requests.get(
-            f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
-            timeout=TIMEOUT,
-        ).text
-    )["stats"]
+    stats = requests.get(
+        f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
+        timeout=TIMEOUT,
+    ).json()["stats"]
 
     stat_values = []
     for stat in stats:
@@ -232,26 +229,21 @@ def get_pokemon_moves(name: str) -> list[str]:
     """
     ret: list = []
 
-    try:
-        name = name.replace("-gmax", "")
+    name = name.replace("-gmax", "")
 
-        url = f"https://pokeapi.co/api/v2/pokemon/{name}"
+    url = f"https://pokeapi.co/api/v2/pokemon/{name}"
 
-        response = requests.get(url, timeout=TIMEOUT)
+    response = requests.get(url, timeout=TIMEOUT)
 
-        json_response = json.loads(response.text)
+    json_response = response.json()
 
-        moves = json_response["moves"]
+    moves = json_response["moves"]
 
-        while len(ret) < 4:
-            move = get_random_move(moves)
+    while len(ret) < 4:
+        move = get_random_move(moves)
 
-            if move not in ret:
-                ret.append(move)
-
-    except IndexError:
-        # TODO: Handle this exception in upper levels
-        pass
+        if move not in ret:
+            ret.append(move)
     return ret
 
 
@@ -342,11 +334,7 @@ def get_nature() -> dict[Any, Any] | None:
 
     """
     try:
-        natures = dict(
-            json.loads(
-                requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).text,
-            ),
-        )
+        natures = requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).json()
     except requests.ConnectionError:
         logger.error("Error trying to get natures list")
         return None
@@ -373,7 +361,7 @@ def pick_nature(natures: dict[Any, Any]) -> dict[Any, Any]:
     random_nature = natures["results"][randbelow(len(natures["results"]))]
     detailed_nature = requests.get(random_nature["url"], timeout=TIMEOUT)
 
-    return dict(json.loads(detailed_nature.text))
+    return detailed_nature.json()
 
 
 def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | None:
@@ -390,8 +378,8 @@ def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | No
 
     """
     try:
-        text_response = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).text
-        return list[dict[Any, Any]](json.loads(text_response)["types"])
+        response = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+        return list[dict[Any, Any]](response["types"])
 
     except KeyError:
         logger.error("Types could not be obtained.")
@@ -415,12 +403,10 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
     try:
-        varieties: list[Any] = json.loads(
-            requests.get(
-                f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-                timeout=TIMEOUT,
-            ).text
-        )["varieties"]
+        varieties: list[Any] = requests.get(
+            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+            timeout=TIMEOUT,
+        ).json()["varieties"]
     except requests.ConnectionError:
         logger.error("Timeout exception trying to get Pokémon varieties")
         return discord.Embed(title="Error generating Pokémon data")

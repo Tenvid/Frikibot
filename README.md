@@ -1,36 +1,57 @@
-# Pokémon Generator Bot
+# Pokébot
 
-## About
-
-This project has been made entirely by [David Gómez](https://www.linkedin.com/in/david-g-89a22825b/).
+Discord bot which generates an embed with a random Pokémon
 
 ## How to run
 
-First of all, rename .env_example to .env and replace token value with the token of your Discord Developer Portal application, if you do not have one, create it.
 
-### Docker (Recommended)
+### Docker compose
+> Note: For this method you will need to have [Docker](https://docs.docker.com/engine/install/) installed
 
-> Note: For this method you will need [Docker](https://docs.docker.com/engine/install/)
+Copy this text in a docker-compose.yml next to `Dockerfile` and replace the placeholders
 
-Go to the folder of the project using `cd` command and then build and run the image for the project:
+```yml
+services:
+  Pokebot:
+    container_name: Pokebot
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    environment:
+      - DATABASE=pokemon.db
+      - TRAINER_TABLE=entrenador
+      - POKEMON_TABLE=pokemon
+      - DISCORD_TOKEN={discord developer token}
+    image: pokebot-image
+    volumes:
+      - {folder in your computer}:/app/db
+```
+
+### Docker run
+
+> Note: For this method you will need to have [Docker](https://docs.docker.com/engine/install/) installed
+
+Create a .env file based on .env_example
+
+
+On the root folder run these commands
 
 ```shell
-docker build --file docker/Dockerfile -t <my_image>:<version> .
+docker build --file docker/Dockerfile -t pokebot-image .
 ```
 
 ```shell
-docker run <my_image>:<version> --name <container_name>
+docker run pokebot-image --name Pokebot
 ```
-
-Then you will have your container with your bot running.
 
 ### As a python script
 
-If you do not want to use Docker, you can install the dependencies in your machine manually and run your script.
-
 > Note: This project is developed to support python 3.11, for the moment, it has not been tested in future or past versions of python
 
-If you have Python 3.11 already installed, you can install the requirements by using:
+- Install dependencies in requirements.txt
+- Create a .env file based on .env_example
+
 
 ```shell
 pip install -r requirements.txt
@@ -39,7 +60,7 @@ pip install -r requirements.txt
 Then, you will be able to run the script.
 
 ```shell
-python main.py
+python __main.py__
 ```
 
 And then your bot will be running.
@@ -50,9 +71,4 @@ All commands start with '-' followed by the command itself.
 
 The main command is '-pokemon' which is the command which generates the Pokémon with its data.
 
-If you want to run another command or if you want to add one by yourself, go to main.py and you will see how I implemented the command I mentioned before so you can take it as a base to implement yours.
-
-## How does this bot work?
-
-What the bot does when you execute '-pokemon' is to make a request to [PokéAPI](https://github.com/PokeAPI/pokeapi) and retrieves data from the response. It also randomizes the color of the Pokémon (if it is shiny or not)
-and gets the image from [PokémonDB](https://pokemondb.net/sprites).
+If you want to run another command or if you want to add one by yourself, go to main.py and you will see the implementation.

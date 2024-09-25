@@ -386,6 +386,29 @@ def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | No
         return None
 
 
+def get_pokemon_ability(variety: dict) -> str:
+    """
+    Pick a nature from the available for the Pokémon.
+
+    Args:
+    ----
+        variety (dict): Pokémon data
+
+    Raises:
+    ------
+        TypeError: Raises if variety is not a dict
+
+    Returns:
+    -------
+        str: Ability name
+
+    """
+    if not isinstance(variety, dict):
+        raise TypeError(f"Variety is not a dict, is of type {type(variety)}")
+
+    return variety["abilities"][randbelow(len(variety["abilities"]))]["ability"]["name"]
+
+
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     Create an Embed from Discord.
@@ -415,6 +438,10 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
     pokemon_name = variety["pokemon"]["name"]
 
+    ability = get_pokemon_ability(
+        requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+    )
+
     nature = get_nature()
 
     moves_string = get_moves_string(pokemon_name)
@@ -434,6 +461,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         nature,
         moves_string,
         stats_string,
+        ability,
     )
 
     types = generate_pokemon_types(variety)
@@ -464,6 +492,7 @@ def _generate_embed(
     nature,
     moves_string,
     stats_string,
+    ability,
 ):
     ret = discord.Embed()
 
@@ -486,5 +515,7 @@ def _generate_embed(
         f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}*"
         f" {pokemon_name.capitalize()}"
     )
+
+    ret.description = f"Ability: {ability.replace('-', ' ').capitalize()}"
 
     return ret

@@ -1,5 +1,7 @@
+# type: ignore
 from unittest.mock import MagicMock, patch
 
+import pytest
 import requests
 
 from frikibot import pokemon_generator
@@ -202,7 +204,9 @@ def test_generate_random_pokemon(mock_embed: MagicMock, mock_message: MagicMock)
 @patch("frikibot.pokemon_generator.correct_name")
 @patch("frikibot.pokemon_generator.get_nature")
 @patch("requests.get")
+@patch("frikibot.pokemon_generator.get_pokemon_ability")
 def test_build_embed(
+    mock_ability: MagicMock,
     mock_get: MagicMock,
     mock_nature: MagicMock,
     mock_name: MagicMock,
@@ -223,11 +227,14 @@ def test_build_embed(
         "varieties": [
             {
                 "pokemon": {
-                    "name": "Pokemon-example"
+                    "name": "Pokemon-example",
+                    "url": "some-url"
                 }
             }
         ]
     }
+
+    mock_ability.return_value = "Ability"
 
     mock_nature.return_value = None
 
@@ -274,7 +281,7 @@ Speed: 0```"""
         embed.image.url
         == "https://img.pokemondb.net/sprites/home/normal/pokemon_name.png"
     )
-
+    assert embed.description == "Ability: Ability"
 
 def test_get_message_normal():
     context = MagicMock()
@@ -349,3 +356,63 @@ def test_get_nature_returns_null_if_there_is_connection_error(mock_get):
     mock_get.side_effect = requests.ConnectionError
 
     assert pokemon_generator.get_nature() == None
+
+def test_get_pokemon_ability_returns_str():
+    variety = {
+        "abilities": [
+            {
+                "ability": {
+                    "name": "Ability"
+                }
+            },
+        ]
+    }
+    assert type(pokemon_generator.get_pokemon_ability(variety)) == str
+
+def test_get_nature_raises_if_variety_is_not_dict():
+    with pytest.raises(TypeError):
+        pokemon_generator.get_pokemon_ability(None)
+
+def test_get_pokemon_ability_raises_specific_message_if_variety_is_not_dict():
+    with pytest.raises(TypeError) as exc:
+        pokemon_generator.get_pokemon_ability(None)
+        assert exc.msg == "Variety is not a dict, is of type None"
+
+def test_get_nature_returns_ability_from_variety():
+    variety = {
+        "abilities": [
+            {
+                "ability": {
+                    "name": "Ability"
+                }
+            },
+        ]
+    }
+
+    assert pokemon_generator.get_pokemon_ability(variety) == "Ability"
+
+@patch("frikibot.pokemon_generator.randbelow")
+def test_get_pokemon_ability_can_return_every_ability(mock_random: MagicMock):
+    variety = {
+        "abilities": [
+            {
+                "ability": {
+                    "name": "Ability1"
+                }
+            },
+            {
+                "ability": {
+                    "name": "Ability2"
+                }
+            },
+            {
+                "ability": {
+                    "name": "Ability3"
+                }
+            },
+        ]
+    }
+
+    for i in range(3):
+        mock_random.return_value = i
+        assert pokemon_generator.get_pokemon_ability(variety) == f"Ability{i+1}"

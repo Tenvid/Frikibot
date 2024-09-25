@@ -6,6 +6,7 @@ This module contains CRUD for Trainers and Pokémon.
 
 import os
 import sqlite3
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -16,7 +17,17 @@ load_dotenv()
 
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")
-DATABASE = os.getenv("DATABASE")
+DATABASE_FOLDER: Path = Path(
+    str(os.getenv("DATABASE_FOLDER")) if os.getenv("DATABASE_FOLDER") else "db"
+)
+DATABASE: Path = Path(
+    DATABASE_FOLDER / str(os.getenv("DATABASE"))
+    if os.getenv("DATABASE")
+    else "pokemon.db"
+)
+
+if not DATABASE_FOLDER.exists():
+    DATABASE_FOLDER.mkdir()
 
 
 class NonExistingElementError(Exception):
@@ -40,8 +51,6 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
         NonExistingElementError: _description_
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     if not TRAINER_TABLE:
         raise NonExistingElementError()
 
@@ -107,8 +116,6 @@ def update_trainer(trainer_code: str, trainer_name: str) -> None:
         NonExistingElementError: _description_
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     if not TRAINER_TABLE:
         raise NonExistingElementError()
 
@@ -140,8 +147,6 @@ def delete_trainer(trainer_code: str) -> None:
         NonExistingElementException: _description_
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     if not TRAINER_TABLE:
         raise NonExistingElementError()
     with sqlite3.connect(DATABASE) as conn:
@@ -171,8 +176,6 @@ def create_pokemon(poke: Pokemon) -> None:
         NonExistingElementException: Raise when POKEMON_TABLE not in .env
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     if not POKEMON_TABLE:
         raise NonExistingElementError()
 
@@ -226,8 +229,6 @@ def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
         list[Pokemon]: List of Pokémon instances.
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         try:
@@ -264,8 +265,6 @@ def create_database():
         NonExistingElementError: Rise if there is no DATABASE in .env
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         try:

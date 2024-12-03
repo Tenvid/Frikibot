@@ -18,6 +18,4 @@ RUN pip install frikibot-0.1.0.tar.gz
 
 WORKDIR /app
 
-COPY frikibot/.env /app/
-
 CMD python -m frikibot

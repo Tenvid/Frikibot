@@ -32,7 +32,10 @@ jobs:
               with:
                 args: --docker
               env:
+                DOCKERFILE: docker/Dockerfile
+                IMAGE_NAME: frikibot
+                TAG_NAME: "v0.0.1"
                 USERNAME: ${{ secrets.DOCKER_USERNAME }}
                 PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-                TAG_NAME: "v0.0.1"
                 BUILDX: "true"
+                LATEST: "true"

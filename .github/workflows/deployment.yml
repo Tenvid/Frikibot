@@ -25,5 +25,14 @@ jobs:
               run: poetry run ruff format . && poetry run ruff check --fix .
             - name: Typing check
               run: poetry run mypy --install-types --non-interactive .
-            - name: Test
+            - name: Test run
               run: poetry run pytest -v tests/
+            - name: Deploy image to Docker hub
+              uses: opspresso/action-docker@master
+              with:
+                args: --docker
+              env:
+                USERNAME: ${{ secrets.DOCKER_USERNAME }}
+                PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+                TAG_NAME: "v0.0.1"
+                BUILDX: "true"

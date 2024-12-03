@@ -28,14 +28,10 @@ jobs:
             - name: Test run
               run: poetry run pytest -v tests/
             - name: Deploy image to Docker hub
-              uses: opspresso/action-docker@master
+              uses: docker/build-push-action@v6.10.0
               with:
-                args: --docker
-              env:
-                DOCKERFILE: docker/Dockerfile
-                IMAGE_NAME: frikibot
-                TAG_NAME: "v0.0.1"
-                USERNAME: ${{ secrets.DOCKER_USERNAME }}
-                PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-                BUILDX: "true"
-                LATEST: "true"
+                repository: tenvid/frikibot
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+                tag_with_ref: true
+            

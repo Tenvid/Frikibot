@@ -1,11 +1,16 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.8
+    rev: v0.9.7
     hooks:
       - id: ruff
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.11
+    rev: v2.14
     hooks:
       - id: vulture
         args: [frikibot, --min-confidence=100]
-        
+  - repo: https://github.com/python-poetry/poetry-plugin-export
+    rev: 1.9.0
+    hooks:
+      - id: poetry-export
+        args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
+

@@ -2,6 +2,7 @@
 name = "frikibot"
 version = "0.1.0"
 description = ""
+license = { text = "LICENSE" }
 authors = [
   { name = "David", email = "<89795659+Tenvid@users.noreply.github.com>" },
 ]

@@ -25,3 +25,22 @@ Or if you have `python`:
 ```python
 python frikibot/__main__.py
 ```
+
+### Running with Docker
+
+> For this method you need [Docker](https://docs.docker.com/get-started/get-docker/)
+
+1. Build
+
+```bash
+docker build -f docker/Dockerfile . -t frikibot:0.1
+```
+
+2. Run
+
+```bash
+docker run --name frikibot_test_args -e DATABASE=pokemon.db \
+  -e TRAINER_TABLE=entrenador -e POKEMON_TABLE=pokemon \
+  -e DISCORD_TOKEN=<YOUR-TOKEN> \
+  frikibot:0.1
+```

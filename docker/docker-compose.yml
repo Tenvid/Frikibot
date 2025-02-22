@@ -3,7 +3,7 @@ services:
     container_name: Frikibot
     build:
       context: ../
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
     environment:
       - DATABASE=${DATABASE}
@@ -12,4 +12,4 @@ services:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
     image: frikibot
     volumes:
-      - ./db/pokemon.db:pokemon.db
+      - ./db/pokemon.db:/app/pokemon.db

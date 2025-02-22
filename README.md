@@ -32,13 +32,14 @@ python frikibot/__main__.py
 
 > For this method you need [Docker](https://docs.docker.com/get-started/get-docker/)
 
-1. Build
+1. Create a bot from an App in [Discord dev portal](https://discord.com/developers/applications)
+2. Build
 
 ```bash
 docker build -f docker/Dockerfile . -t frikibot:0.1
 ```
 
-2. Run
+3. Run
 
 ```bash
 docker run --name frikibot_test_args -e DATABASE=pokemon.db \
@@ -49,9 +50,10 @@ docker run --name frikibot_test_args -e DATABASE=pokemon.db \
 
 ### Running with Docker compose
 
-1. Create a file called `.env` inside `frikibot`
-2. Copy the content from `.env_example` and add your token
-3. Run:
+1. Create a bot from an App in [Discord dev portal](https://discord.com/developers/applications)
+2. Copy the token of your bot
+3. Make a copy of `.env_example` called `.env` and set your token (you can let the other fields by default)
+4. Run
 
 ```bash
 docker compose -f docker/docker-compose.yml --env-file frikibot/.env up

@@ -11,5 +11,5 @@ services:
       - POKEMON_TABLE=${POKEMON_TABLE}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
     image: frikibot
-  volumes:
-    - db/pokemon.db:pokemon.db
+    volumes:
+      - ./db/pokemon.db:pokemon.db

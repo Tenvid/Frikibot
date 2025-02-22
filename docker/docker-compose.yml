@@ -1,0 +1,15 @@
+services:
+  frikibot:
+    container_name: Frikibot
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    environment:
+      - DATABASE=${DATABASE}
+      - TRAINER_TABLE=${TRAINER_TABLE}
+      - POKEMON_TABLE=${POKEMON_TABLE}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    image: frikibot
+    volumes:
+      - ./db/pokemon.db:/app/pokemon.db

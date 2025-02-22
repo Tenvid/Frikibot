@@ -6,6 +6,8 @@ This is a Discord bot that can generate a Pokémon card with random stats.
 
 ## How to run
 
+> For all methods you will need to clone this repo
+
 ### Directly with python
 
 1. Install `requirements.txt` (I recommend to use a virtualenv)
@@ -43,4 +45,14 @@ docker run --name frikibot_test_args -e DATABASE=pokemon.db \
   -e TRAINER_TABLE=entrenador -e POKEMON_TABLE=pokemon \
   -e DISCORD_TOKEN=<YOUR-TOKEN> \
   frikibot:0.1
+```
+
+### Running with Docker compose
+
+1. Create a file called `.env` inside `frikibot`
+2. Copy the content from `.env_example` and add your token
+3. Run:
+
+```bash
+docker compose -f docker/docker-compose.yml --env-file frikibot/.env up
 ```

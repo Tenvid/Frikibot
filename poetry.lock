@@ -1490,5 +1490,5 @@ vulture = ["vulture"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.11"
-content-hash = "64a02ca4f689799c00842351b498ce41508207394d5c4228d7627318406a77cd"
+python-versions = ">=3.11, < 3.13"
+content-hash = "b03238e87ebfbe6c9447ae4f60ef8e8ecc1e6501cdac1c8d1c361b277b189d95"

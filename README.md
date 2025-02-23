@@ -61,3 +61,8 @@ docker run --name frikibot_test_args -e DATABASE=pokemon.db \
 ```bash
 docker compose -f docker/docker-compose.yml --env-file frikibot/.env up
 ```
+
+## Commands
+
+`-pokemon`: Generates a Pokémon card.
+`-dex`: You can navigate between your Pokémon.

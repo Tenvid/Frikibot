@@ -10,6 +10,9 @@ This is a Discord bot that can generate a Pokémon card with random stats.
 
 ### Directly with python
 
+> For this method you need a Python version higher than python 3.11
+> and lower than python 3.13.
+
 1. Install `requirements.txt` (I recommend to use a virtualenv)
 2. Create a bot from an App in [Discord dev portal](https://discord.com/developers/applications)
 3. Copy the token of your bot

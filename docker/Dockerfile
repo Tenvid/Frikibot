@@ -12,7 +12,7 @@ COPY --from=builder /app/dist/frikibot-0.1.1.dev0.tar.gz /build/
 
 WORKDIR /build
 
-RUN pip install --no-cache-dir frikibot-0.1.0.tar.gz
+RUN pip install --no-cache-dir frikibot-0.1.1.dev0.tar.gz
 
 WORKDIR /app
 

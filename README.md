@@ -1,6 +1,6 @@
 # Frikibot
 
-This is a Discord bot that can generate a Pokémon card with random stats.
+This is an example for a Discord bot that can generate a Pokémon card with random stats.
 
 ![./images/PokemonCardExample.png](./images/PokemonCardExample.png)
 

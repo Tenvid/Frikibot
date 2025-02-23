@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - tests
+  pull_request:
+    types: [opened]
+    branches:
+        - main
+        - dev
+        - tests
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v4
+
+      - name: Python install
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+
+      - name: Poetry setup
+        run: pip install poetry && poetry install --with dev
+
+      - name: Tests execution
+        run: poetry run pytest -v tests/

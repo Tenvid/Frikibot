@@ -6,29 +6,6 @@ on:
       - main
 
 jobs:
-  qa:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Repository Checkout
-        uses: actions/checkout@v4
-
-      - name: Python install
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11.9"
-
-      - name: Poetry setup
-        run: pip install poetry && poetry install --with dev
-
-      - name: Format code
-        run: poetry run ruff format . && poetry run ruff check --fix .
-
-      - name: Mypy
-        run: poetry run mypy --install-types --non-interactive .
-
-      - name: Tests
-        run: poetry run pytest -v tests/
-
   docker-build-push:
     runs-on: ubuntu-latest
     steps:

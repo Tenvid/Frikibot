@@ -21,8 +21,10 @@ from frikibot.database_handler import (
 from frikibot.paginated_view import PaginatedView
 
 load_dotenv()
+
 # Bot token obtained from the environment variable
 TOKEN = os.getenv("DISCORD_TOKEN")
+
 # Bot instance
 bot = pokemon_generator.bot
 
@@ -36,20 +38,6 @@ logger = logging.getLogger("main")
 async def on_ready() -> None:
     """Print a log message when bot is connected."""
     print("Connected")
-
-
-@bot.command(name="hello", help="Says hello to the user")  # type: ignore
-@commands.cooldown(1, 5, commands.BucketType.user)
-async def hello(ctx: commands.Context[typing.Any]) -> None:
-    """
-    Greet user.
-
-    Args:
-    ----
-        ctx (commands.Context[typing.Any]): Command context
-
-    """
-    await ctx.send(f"Hola, {ctx.author.mention}!")
 
 
 @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore

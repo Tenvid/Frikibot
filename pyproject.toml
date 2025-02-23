@@ -7,7 +7,7 @@ authors = [
   { name = "David", email = "<89795659+Tenvid@users.noreply.github.com>" },
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, < 3.13"
 
 dependencies = [
   "python_dotenv (==1.0.1)",

@@ -64,5 +64,5 @@ docker compose -f docker/docker-compose.yml --env-file frikibot/.env up
 
 ## Commands
 
-`-pokemon`: Generates a Pokémon card.
-`-dex`: You can navigate between your Pokémon.
+- `-pokemon`: Generates a Pokémon card.
+- `-dex`: You can navigate between your Pokémon.

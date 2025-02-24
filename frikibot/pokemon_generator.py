@@ -77,9 +77,7 @@ def get_pokemon_stats(name: str, modified_stats: tuple[str | None, str | None]) 
         timeout=TIMEOUT,
     ).json()["stats"]
 
-    stat_values = []
-    for stat in stats:
-        stat_values.append(stat["base_stat"])
+    stat_values = [stat["base_stat"] for stat in stats]
 
     return Stats(
         stat_values[0],
@@ -118,7 +116,7 @@ def get_moves_string(name: str) -> str:
 
     ret += "```"
 
-    logger.info(f"Moves: {', '.join(moves)}")
+    logger.info("Moves: %s", ",".join(moves))
     return ret
 
 
@@ -161,9 +159,8 @@ def correct_name(
         str: Pokémon name with the correct format
 
     """
-    if "pikachu" in name:
-        if 1 <= varieties.index(variety) <= 6 or varieties.index(variety) == 14:
-            return eliminate_invalid_forms(varieties)
+    if "pikachu" in name and (varieties.index(variety) in (range(1, 7), 14)):
+        return eliminate_invalid_forms(varieties)
 
     if "minior" in name:
         if "meteor" in name:
@@ -172,9 +169,7 @@ def correct_name(
         else:
             name += "-core"
 
-    name = correct_suffixes(name)
-
-    return name
+    return correct_suffixes(name)
 
 
 def correct_suffixes(name: str) -> str:
@@ -318,8 +313,8 @@ def get_changed_stats(nature: dict[Any, Any] | None) -> tuple[str | None, str | 
         decreased = None
         increased = None
 
-    logger.info(f"Decreased stat: {decreased}")
-    logger.info(f"Increased stat: {increased}")
+    logger.info("Decreased stat: %s", decreased)
+    logger.info("Increased stat: %s", increased)
 
     return decreased, increased
 
@@ -341,7 +336,7 @@ def get_nature() -> dict[Any, Any] | None:
 
     nature = pick_nature(natures)
 
-    logger.info(f"Nature: {nature['name']}")
+    logger.info("Nature: %s", nature["name"])
     return nature
 
 

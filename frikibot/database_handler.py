@@ -4,6 +4,7 @@ Script made by David Gómez.
 This module contains CRUD for Trainers and Pokémon.
 """
 
+import logging
 import os
 import sqlite3
 from pathlib import Path
@@ -14,6 +15,8 @@ from dotenv import load_dotenv
 from frikibot.pokemon import Pokemon
 
 load_dotenv()
+
+logger = logging.getLogger("Database")
 
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")
@@ -33,8 +36,6 @@ if not DATABASE_FOLDER.exists():
 class NonExistingElementError(Exception):
     """Raise when an element is missing."""
 
-    pass
-
 
 def create_trainer(trainer_name: str, trainer_code: str) -> None:
     """
@@ -52,7 +53,7 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
     """
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -85,9 +86,9 @@ def read_trainer(trainer_code: str) -> Any | None:
 
     """
     if not DATABASE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -117,7 +118,7 @@ def update_trainer(trainer_code: str, trainer_name: str) -> None:
 
     """
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -148,7 +149,7 @@ def delete_trainer(trainer_code: str) -> None:
 
     """
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -177,7 +178,7 @@ def create_pokemon(poke: Pokemon) -> None:
 
     """
     if not POKEMON_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -195,7 +196,7 @@ INSERT INTO {POKEMON_TABLE} (
                         Naturaleza
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """,
+        """,  # noqa
             (
                 poke.name,
                 poke.first_type,
@@ -209,7 +210,7 @@ INSERT INTO {POKEMON_TABLE} (
             ),
         )
         conn.commit()
-        print("Pokemon inserted")
+        logger.info("Pokemon inserted")
 
 
 def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
@@ -249,8 +250,7 @@ def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
             """,
                 (trainer_code,),
             )
-            ret = [Pokemon.from_tuple(row) for row in cursor.fetchall()]
-            return ret
+            return [Pokemon.from_tuple(row) for row in cursor.fetchall()]
 
         except sqlite3.Error as e:
             raise e
@@ -280,7 +280,7 @@ def create_database():
 );
 """)
         except sqlite3.OperationalError:
-            pass  # TODO: Add info message
+            logger.error("There was an error creating the %s table", TRAINER_TABLE)
 
         try:
             cursor.execute(f"""
@@ -300,6 +300,6 @@ def create_database():
 );
 """)
         except sqlite3.OperationalError:
-            pass
+            logger.error("There was an error creating %s table", POKEMON_TABLE)
 
         conn.commit()

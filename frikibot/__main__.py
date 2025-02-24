@@ -37,7 +37,7 @@ logger = logging.getLogger("main")
 @bot.event
 async def on_ready() -> None:
     """Print a log message when bot is connected."""
-    print("Connected")
+    logger.info("Connected")
 
 
 @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore

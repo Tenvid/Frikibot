@@ -51,7 +51,6 @@ select = [
   "W391",
   "W505",
   "I",
-  "N",
   "UP006",
   "UP007",
   "UP008",
@@ -71,13 +70,38 @@ select = [
   "DTZ",   # Datetime
   "ISC",   # Implicit string concatenation
   "ICN",   # Import conventions
-] # Only rules before (ICN) have been added for the moment
+  "LOG",   # Logging rules
+  "G",     # Logging rules
+  "PIE",   # Avoid unnecessary code
+  "T20",   # Do not use print or pprint
+  "PYI",
+  "PT",
+  "Q",
+  "RSE",
+  "RET",
+  "SLF",
+  "SIM",
+  "SLOT",
+  "TID",
+  "TD",
+  "ARG",
+  "PTH",
+  "FLY",
+  "C90",
+  "N",
+  "PERF",
+  "W",
+  "DOC",
+
+]
 
 ignore = [
   "D203",   # Empty line between class declaration and docstring
   "D212",   # Docstring summary in first line
   "ICN003", # Prohibit 'from' in import
-  "COM812", # Conflict with ISC001 | Checks for absensce of trailing comma
+  "COM812", # Conflict with ISC001 | Checks for absensce of trailing commas
+  "TD002",
+  "TD003",
 ]
 
 [tool.pytest.ini_options]

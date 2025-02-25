@@ -92,8 +92,6 @@ select = [
   "N",
   "PERF",
   "W",
-  "DOC",
-
 ]
 
 ignore = [

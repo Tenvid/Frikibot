@@ -2,7 +2,7 @@
 name: "\U0001F7E1Bug report"
 about: Create a report to help us improve
 title: "[BUG]"
-labels: enhancement
+labels: bug
 assignees: ''
 
 ---

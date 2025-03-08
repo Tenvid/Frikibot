@@ -5,8 +5,11 @@ This module makes a request to PokeAPI and uses its info to generate
 a random Pokémon.
 """
 
+import json
 import logging
+from random import choice
 from secrets import randbelow
+import time
 from typing import Any
 
 import discord
@@ -14,18 +17,32 @@ import requests
 from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
+from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
 from frikibot.stats import Stats
+from frikibot.variety_data import VarietyData
 
 bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
-
-MAX_INDEX = 1010
-
-TIMEOUT = 10
-
-logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
+logging.basicConfig(level="DEBUG", format="%(name)s-%(levelname)s-%(message)s")
 logger = logging.getLogger(name="PkGenerator")
 
+
+def _get_natures_list() -> list[dict[str, str]] | None:
+    response = requests.get("https://pokeapi.co/api/v2/nature?limit=25", timeout=TIMEOUT)
+    if response.status_code == 200:
+        return response.json()["results"]
+    return None
+
+
+def _fetch_random_nature() -> dict:
+    if NATURES:
+        response = requests.get(choice(NATURES)["url"], timeout=TIMEOUT)
+        if response.status_code == 200:
+            return response.json()
+    return {}
+
+
+NATURES = _get_natures_list()
 NAME_REPLACEMENTS = {
     "gmax": "gigantamax",
     "alola": "alolan",
@@ -93,7 +110,7 @@ def get_pokemon_stats(name: str, modified_stats: tuple[str | None, str | None]) 
     )
 
 
-def get_moves_string(name: str) -> str:
+def get_moves_string(moves_list: list[str]) -> str:
     """
     Generate string with the moves of the Pokémon from the possible ones.
 
@@ -106,19 +123,17 @@ def get_moves_string(name: str) -> str:
         str: String with moves in a list form
 
     """
-    moves = get_pokemon_moves(name)
-
     ret = "```\n"
 
-    for move in moves:
+    for move in moves_list:
         ret += f"{move}"
-        if move == moves[-1]:
+        if move == moves_list[-1]:
             break
         ret += "\n"
 
     ret += "```"
 
-    logger.info(f"Moves: {', '.join(moves)}")
+    logger.info(f"Moves: {', '.join(moves_list)}")
     return ret
 
 
@@ -386,13 +401,14 @@ def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | No
         return None
 
 
-def get_pokemon_ability(variety: dict) -> str:
+def get_pokemon_ability(abilities_list: list[dict]) -> str:
     """
     Pick a nature from the available for the Pokémon.
 
     Args:
     ----
-        variety (dict): Pokémon data
+        abilities_list (list[dict]): List which contains json data
+        about available abilities.
 
     Raises:
     ------
@@ -400,15 +416,18 @@ def get_pokemon_ability(variety: dict) -> str:
 
     Returns:
     -------
-        str: Ability name
+        str: Name of am ability chosen randomly.
 
     """
-    if not isinstance(variety, dict):
-        raise TypeError(f"Variety is not a dict, is of type {type(variety)}")
-
-    return variety["abilities"][randbelow(len(variety["abilities"]))]["ability"]["name"]
+    logger.debug("Ability-list: %s", json.dumps(abilities_list, indent=3))
+    return abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
 
 
+# def get_clean_moves_string():
+#     get_moves_string(variety["pokemon"]["name"])
+#         .replace("```", "")
+#         .split("\n")
+#
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     Create an Embed from Discord.
@@ -435,49 +454,76 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         return discord.Embed(title="Error generating Pokémon data")
 
     variety = varieties[randbelow(len(varieties))]
+    detailed_variety = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+    nature = get_nature()
+    types = detailed_variety["types"]
 
-    pokemon_name = variety["pokemon"]["name"]
-
-    ability = get_pokemon_ability(
-        requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+    data = VarietyData(
+        available_abilities=detailed_variety["abilities"],
+        available_moves=detailed_variety["moves"],
+        combat_stats=detailed_variety["stats"],
+        name=detailed_variety["name"],
+        sprite=detailed_variety["sprites"]["other"]["home"],
+        types=detailed_variety["types"],
     )
 
-    nature = get_nature()
+    logger.debug("VarietyData created")
 
-    moves_string = get_moves_string(pokemon_name)
+    pokemon_entity = Pokemon(
+        name=data.name,
+        list_index=pokemon_index,
+        author_code=str(ctx.author.id),
+        nature=_fetch_random_nature(),
+        first_type=data.types[0]["type"]["name"],
+        second_type=data.types[1]["type"]["name"] if len(data.types) > 1 else "none",
+        available_moves=data.available_moves,
+        available_abilities=data.available_abilities,
+        stats_data=data.combat_stats,
+    )
+
+    logger.debug("Pokemon move list: %s", str(pokemon_entity.moves_list))
+
+    logger.debug("Pokemon created")
+
+    # moves_string = get_moves_string(pokemon_entity.moves_list)
+
+    logger.debug("Moves string generated")
 
     stats_string = (
         "```ansi\n"
-        + str(get_pokemon_stats(pokemon_name, get_changed_stats(nature)))
+        + str(
+            get_pokemon_stats(
+                pokemon_entity.name, get_changed_stats(pokemon_entity.nature)
+            )
+        )
         + "```"
     )
 
+    logger.debug("Stats string generated")
     embed = _generate_embed(
         color,
-        pokemon_index,
+        pokemon_entity.pokedex_number,
         varieties,
         variety,
-        pokemon_name,
-        nature,
-        moves_string,
+        pokemon_entity.name,
+        pokemon_entity.nature,
+        get_moves_string(pokemon_entity.moves_list),
         stats_string,
-        ability,
+        pokemon_entity.ability,
     )
 
-    types = generate_pokemon_types(variety)
-
-    create_pokemon(
-        Pokemon(
-            name=pokemon_name,
-            list_index=pokemon_index,
-            moves_list=moves_string.replace("```", "").split("\n"),
-            nature=nature["name"] if nature else "None",
-            first_type=types[0]["type"]["name"] if types else "none",
-            second_type=types[1]["type"]["name"] if types and len(types) > 1 else "none",
-            author_code=str(ctx.author.id),
-        ),
-    )
-
+    # create_pokemon(
+    #     Pokemon(
+    #         name=pokemon_name,
+    #         list_index=pokemon_index,
+    #         moves_list=moves_string.replace("```", "").split("\n"),
+    #         nature=nature["name"] if nature else "None",
+    #         first_type=types[0]["type"]["name"] if types else "none",
+    #         second_type=types[1]["type"]["name"] if types and len(types) > 1 else "none",
+    #         author_code=str(ctx.author.id),
+    #     ),
+    # )
+    create_pokemon(pokemon_entity)
     logger.info(msg="Embed title set")
 
     return embed

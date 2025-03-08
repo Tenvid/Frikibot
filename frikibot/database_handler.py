@@ -15,6 +15,10 @@ from frikibot.pokemon import Pokemon
 
 load_dotenv()
 
+from logging import getLogger
+
+logger = getLogger("DB-Handler")
+
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")
 DATABASE_FOLDER: Path = Path(
@@ -179,10 +183,19 @@ def create_pokemon(poke: Pokemon) -> None:
     if not POKEMON_TABLE:
         raise NonExistingElementError()
 
+    logger.debug(poke.name)
+    logger.debug(poke.first_type)
+    logger.debug(poke.second_type)
+    logger.debug(poke.author_code)
+    logger.debug(poke.moves_list)
+    for move in poke.moves_list:
+        logger.debug("Move: %s, type: %s", move, type(move))
+    logger.debug(poke.nature_name)
     with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            f"""
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"""
 INSERT INTO {POKEMON_TABLE} (
                         Name,
                         Tipo1,
@@ -196,20 +209,22 @@ INSERT INTO {POKEMON_TABLE} (
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         """,
-            (
-                poke.name,
-                poke.first_type,
-                poke.second_type,
-                poke.author_code,
-                poke.moves_list[1],
-                poke.moves_list[2],
-                poke.moves_list[3],
-                poke.moves_list[4],
-                poke.nature,
-            ),
-        )
-        conn.commit()
-        print("Pokemon inserted")
+                (
+                    poke.name,
+                    poke.first_type,
+                    poke.second_type,
+                    poke.author_code,
+                    poke.moves_list[0],
+                    poke.moves_list[1],
+                    poke.moves_list[2],
+                    poke.moves_list[3],
+                    poke.nature_name,
+                ),
+            )
+            conn.commit()
+            print("Pokemon inserted")
+        except Exception as exc:
+            logger.error(exc)
 
 
 def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:

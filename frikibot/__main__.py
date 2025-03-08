@@ -41,7 +41,9 @@ async def on_ready() -> None:
 
 
 @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
-@bot.command(name="pokemon", help="Generates a random Pokémon")
+@bot.command(
+    name="test-pokemon", help="Generates a random Pokémon"
+)  # TODO: Make name "pokemon"
 async def pokemon(
     ctx: commands.Context[typing.Any],
 ) -> None:

@@ -39,8 +39,8 @@ class PaginatedView(discord.ui.View):
             embed.add_field(
                 name=elem.name.capitalize(),
                 value=f"""
-                {', '.join(elem.moves_list)}
-                {elem.nature.capitalize()}
+                {", ".join(elem.moves_list)}
+                {elem.nature_name.capitalize()}
             """,
                 inline=False,
             )

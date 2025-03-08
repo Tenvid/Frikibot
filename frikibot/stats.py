@@ -10,23 +10,25 @@ import math
 class Stats:
     """Pokémon stats definition."""
 
-    hp: int
-    attack: int
-    defense: int
-    special_attack: int
-    special_defense: int
-    speed: int
+    hp: int | None
+    attack: int | None
+    defense: int | None
+    special_attack: int | None
+    special_defense: int | None
+    speed: int | None
 
     def __init__(
         self,
-        hp: int,
-        attack: int,
-        defense: int,
-        special_attack: int,
-        special_defense: int,
-        speed: int,
+        data: dict | None,
         decreased: str | None = None,
         increased: str | None = None,
+        *,
+        hp: int | None,
+        attack: int | None,
+        defense: int | None,
+        special_attack: int | None,
+        special_defense: int | None,
+        speed: int | None,
     ):
         """
         Pokémon stats constructor.
@@ -43,12 +45,20 @@ class Stats:
             increased (str | None, optional): Stat increased by nature. Defaults to None.
 
         """
-        self.hp = hp
-        self.attack = attack
-        self.defense = defense
-        self.special_attack = special_attack
-        self.special_defense = special_defense
-        self.speed = speed
+        if data:
+            self.hp = data[0]["base_stat"]
+            self.attack = data[1]["base_stat"]
+            self.defense = data[2]["base_stat"]
+            self.special_attack = data[3]["base_stat"]
+            self.special_defense = data[4]["base_stat"]
+            self.speed = data[5]["base_stat"]
+        else:
+            self.hp = hp
+            self.attack = attack
+            self.defense = defense
+            self.special_attack = special_attack
+            self.special_defense = special_defense
+            self.speed = speed
         self.decreased = decreased
         self.increased = increased
 

@@ -10,8 +10,6 @@ import typing
 import discord
 from discord.ext import commands
 
-from frikibot.pokemon import Pokemon
-
 
 class PaginatedView(discord.ui.View):
     """Definition of paginated view."""
@@ -21,7 +19,7 @@ class PaginatedView(discord.ui.View):
     separator: int = 5
     user: str = "User"
 
-    def create_embed(self, data: list[Pokemon]) -> discord.Embed:
+    def create_embed(self, data: list[tuple]) -> discord.Embed:
         """
         Generate list page.
 
@@ -37,13 +35,10 @@ class PaginatedView(discord.ui.View):
         embed = discord.Embed(title=f"{self.user.capitalize()} Pokémon list")
         for elem in data:
             embed.add_field(
-                name=elem.name.capitalize(),
-                value=f"""
-                {', '.join(elem.moves_list)}
-                {elem.nature.capitalize()}
-            """,
-                inline=False,
+                name=elem[1].replace("-", " ").capitalize(),
+                value="\n".join([x.replace("-", " ").capitalize() for x in elem[5:9]]),
             )
+
         return embed
 
     async def send(self, ctx: commands.Context[typing.Any]) -> None:
@@ -147,6 +142,5 @@ class PaginatedView(discord.ui.View):
         await interaction.response.defer()
         last_element = len(self.data)
         self.current_page = math.ceil(last_element / self.separator)
-        # last_element = self.current_page * self.separator
         starter_item = last_element - self.separator
         await self.update_message(self.data[starter_item:last_element])

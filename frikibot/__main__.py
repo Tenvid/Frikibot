@@ -8,6 +8,7 @@ import logging
 import os
 import typing
 
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -26,7 +27,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Bot instance
-bot = pokemon_generator.bot
+bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 

@@ -66,7 +66,9 @@ class PaginatedView(discord.ui.View):
 
     @discord.ui.button(label="<<-", style=discord.ButtonStyle.primary)
     async def first_page_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,  # noqa
     ):
         """
         Define button to return to first page.
@@ -85,7 +87,9 @@ class PaginatedView(discord.ui.View):
 
     @discord.ui.button(label="<-", style=discord.ButtonStyle.primary)
     async def previous_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,  # noqa
     ):
         """
         Define button to go to previous page.
@@ -105,7 +109,9 @@ class PaginatedView(discord.ui.View):
 
     @discord.ui.button(label="->", style=discord.ButtonStyle.primary)
     async def next_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,  # noqa
     ):
         """
         Define button to go to next page.
@@ -128,7 +134,9 @@ class PaginatedView(discord.ui.View):
 
     @discord.ui.button(label="->>", style=discord.ButtonStyle.primary)
     async def last_page_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,  # noqa
     ):
         """
         Define button to go to last page.

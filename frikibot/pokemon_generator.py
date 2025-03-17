@@ -79,7 +79,7 @@ def get_moves_string(moves_list: list[str]) -> str:
 
     ret += "```"
 
-    logger.info(f"Moves: {', '.join(moves_list)}")
+    logger.info("Moves: ", ", ".join(moves_list))
     return ret
 
 
@@ -153,8 +153,7 @@ def get_varieties(pokemon_index: int) -> list[Any]:
         if response.status_code != 200:
             logger.error("Status code unexpected for index (%s)", pokemon_index)
             raise requests.exceptions.ConnectionError
-        else:
-            return response.json()["varieties"]
+        return response.json()["varieties"]
     except requests.Timeout as exc:
         logger.error("Timeout error happened trying to get the varieties: %s", exc)
         raise exc

@@ -18,7 +18,6 @@ from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
 from frikibot.variety_data import VarietyData
 
-bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 logging.basicConfig(
     level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s"
 )

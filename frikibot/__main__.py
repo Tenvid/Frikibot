@@ -8,6 +8,7 @@ import logging
 import os
 import typing
 
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -26,7 +27,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Bot instance
-bot = pokemon_generator.bot
+bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 
@@ -36,8 +37,8 @@ logger = logging.getLogger("main")
 # Event realised when the bot is connected
 @bot.event
 async def on_ready() -> None:
-    """Print a log message when bot is connected."""
-    print("Connected")
+    """Print a message when bot is connected."""
+    logger.info("Connected")
 
 
 @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
@@ -85,7 +86,7 @@ async def on_command_error(
     error: commands.CommandError,
 ) -> None:
     """
-    Tell the user that an error happened.
+    Handle commands errors depending on its type.
 
     Args:
     ----

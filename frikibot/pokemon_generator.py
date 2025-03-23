@@ -56,7 +56,7 @@ NATURES = _get_natures_list()
 
 def get_moves_string(moves_list: list[str]) -> str:
     """
-    Generate string with the moves of the Pokémon from the possible ones.
+    Generate a string with the moves of the Pokémon from the possible ones.
 
     Args:
     ----
@@ -164,7 +164,7 @@ def get_varieties(pokemon_index: int) -> list[Any]:
 
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
-    Create an Embed from Discord.
+    Create embed message to display all data.
 
     Args:
     ----

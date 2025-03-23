@@ -85,8 +85,6 @@ def read_trainer(trainer_code: str) -> Any | None:
         Any: Trainer with the given id.
 
     """
-    if not DATABASE:
-        raise NonExistingElementError
     if not TRAINER_TABLE:
         raise NonExistingElementError
 

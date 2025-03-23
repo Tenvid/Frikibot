@@ -58,11 +58,12 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
+
+        query = f"INSERT INTO {TRAINER_TABLE}"
+        "(trainer_name, trainer_code, enabled) VALUES (%s, %s, 1)"
+
         cursor.execute(
-            f"INSERT INTO {TRAINER_TABLE}"  # noqa: S608
-            "(trainer_name, trainer_code, enabled) VALUES (?, ?, 1)",  # noqa: S608
-            # Ignored because user cannot insert values to make SQL
-            # Injection and I want the possibility to change table name with .env
+            query,
             (trainer_name, trainer_code),
         )
         conn.commit()
@@ -90,12 +91,16 @@ def read_trainer(trainer_code: str) -> Any | None:
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
+        query = (
+            f"SELECT * FROM {TRAINER_TABLE} WHERE trainer_code = '%s' AND enabled = 1"
+            % trainer_code
+        )
         cursor.execute(
-            f"""SELECT *
-                    FROM {TRAINER_TABLE}
-                    WHERE trainer_code = ? AND enabled = 1
-            """,  # noqa: S608 - Ignored because user cannot insert values to make SQL Injection and I want the possibility to change table name with .env
-            (trainer_code,),
+            query,
+            (
+                TRAINER_TABLE,
+                trainer_code,
+            ),
         )
         return cursor.fetchone()
 

@@ -41,7 +41,7 @@ async def on_ready() -> None:
     logger.info("Connected")
 
 
-@commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
+@commands.cooldown(1, 5, commands.BucketType.user)
 @bot.command(name="pokemon", help="Generates a random Pokémon")
 async def pokemon(
     ctx: commands.Context[typing.Any],
@@ -61,7 +61,7 @@ async def pokemon(
     await ctx.send(message, embed=embed)
 
 
-@commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
+@commands.cooldown(1, 5, commands.BucketType.user)
 @bot.command(
     name="dex", help="List all Pokémon from user and show them in a paginated view"
 )

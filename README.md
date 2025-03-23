@@ -4,10 +4,6 @@ This is an example for a Discord bot that can generate a Pokémon card with rand
 
 ![./images/PokemonCardExample.png](./images/PokemonCardExample.png)
 
-## Contributing
-
-> See [CONTRIBUTING.md](/CONTRIBUTING.md)
-
 ## How to run
 
 > For all methods you will need to clone this repo

@@ -14,7 +14,6 @@ dependencies = [
   "requests (==2.32.2)",
   "types-requests (==2.32.0.20240712)",
   "discord-py (==2.3.2)",
-  "sqlalchemy (==2.0.38)",
 ]
 
 [project.optional-dependencies]
@@ -37,11 +36,8 @@ poetry-plugin-export = ">=1.8"
 [tool.ruff]
 line-length = 90
 indent-width = 4
-# exclude = ["tests"]
+exclude = ["tests"]
 target-version = "py311"
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "D"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -55,6 +51,7 @@ select = [
   "W391",
   "W505",
   "I",
+  "N",
   "UP006",
   "UP007",
   "UP008",
@@ -74,36 +71,13 @@ select = [
   "DTZ",   # Datetime
   "ISC",   # Implicit string concatenation
   "ICN",   # Import conventions
-  "LOG",   # Logging rules
-  "G",     # Logging rules
-  "PIE",   # Avoid unnecessary code
-  "T20",   # Do not use print or pprint
-  "PYI",
-  "PT",
-  "Q",
-  "RSE",
-  "RET",
-  "SLF",
-  "SIM",
-  "SLOT",
-  "TID",
-  "TD",
-  "ARG",
-  "PTH",
-  "FLY",
-  "C90",
-  "N",
-  "PERF",
-  "W",
-]
+] # Only rules before (ICN) have been added for the moment
 
 ignore = [
   "D203",   # Empty line between class declaration and docstring
   "D212",   # Docstring summary in first line
   "ICN003", # Prohibit 'from' in import
-  "COM812", # Conflict with ISC001 | Checks for absensce of trailing commas
-  "TD002",
-  "TD003",
+  "COM812", # Conflict with ISC001 | Checks for absensce of trailing comma
 ]
 
 [tool.pytest.ini_options]
@@ -119,4 +93,3 @@ pre-commit = "3.8.0"
 coverage = "7.5.3"
 ipython = "8.25.0"
 vulture = "2.11"
-pytest-cov = "^6.0.0"

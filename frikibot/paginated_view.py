@@ -25,11 +25,11 @@ class PaginatedView(discord.ui.View):
 
         Args:
         ----
-            data (list): Data list which will be shown in pages.
+            data (list): List of elements to be shown.
 
         Returns:
         -------
-            discord.Embed: Selected list page.
+            discord.Embed: Embed with data.
 
         """
         embed = discord.Embed(title=f"{self.user.capitalize()} Pokémon list")

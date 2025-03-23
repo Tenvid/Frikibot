@@ -37,7 +37,7 @@ logger = logging.getLogger("main")
 # Event realised when the bot is connected
 @bot.event
 async def on_ready() -> None:
-    """Print a log message when bot is connected."""
+    """Print a message when bot is connected."""
     logger.info("Connected")
 
 
@@ -86,7 +86,7 @@ async def on_command_error(
     error: commands.CommandError,
 ) -> None:
     """
-    Tell the user that an error happened.
+    Handle commands errors depending on its type.
 
     Args:
     ----

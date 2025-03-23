@@ -45,13 +45,12 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
     Args:
     ----
-        trainer_name (str): _description_
-        trainer_code (str): _description_
+        trainer_name (str): Trainer name. Same as Discord username.
+        trainer_code (str): Trainer primary key. Same as Discord inner id.
 
     Raises:
     ------
-        NonExistingElementError: _description_
-        NonExistingElementError: _description_
+        NonExistingElementError: Raise if there is no trainer table set.
 
     """
     if not TRAINER_TABLE:
@@ -71,20 +70,19 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
 def read_trainer(trainer_code: str) -> Any | None:
     """
-    Get data of a trainer by its code.
+    Get trainer from database by its ID.
 
     Args:
     ----
-        trainer_code (str): _description_
+        trainer_code (str): Trainer ID.
 
     Raises:
     ------
-        NonExistingElementError: _description_
-        NonExistingElementError: _description_
+        NonExistingElementError: Raises if no Trainer table is set.
 
     Returns:
     -------
-        _type_: _description_
+        Any: Trainer with the given id.
 
     """
     if not DATABASE:
@@ -104,7 +102,6 @@ def read_trainer(trainer_code: str) -> Any | None:
         return cursor.fetchone()
 
 
-
 def create_pokemon(poke: Pokemon) -> None:
     """
     Insert a Pokémon in database.
@@ -115,7 +112,6 @@ def create_pokemon(poke: Pokemon) -> None:
 
     Raises:
     ------
-        NonExistingElementException: Raise when DATABASE not in .env
         NonExistingElementException: Raise when POKEMON_TABLE not in .env
 
     """

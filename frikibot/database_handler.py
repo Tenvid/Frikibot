@@ -4,8 +4,10 @@ Script made by David Gómez.
 This module contains CRUD for Trainers and Pokémon.
 """
 
+import logging
 import os
 import sqlite3
+from logging import getLogger
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +16,9 @@ from dotenv import load_dotenv
 from frikibot.pokemon import Pokemon
 
 load_dotenv()
+logger = getLogger("DB-Handler")
+
+logger = logging.getLogger("Database")
 
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")
@@ -33,8 +38,6 @@ if not DATABASE_FOLDER.exists():
 class NonExistingElementError(Exception):
     """Raise when an element is missing."""
 
-    pass
-
 
 def create_trainer(trainer_name: str, trainer_code: str) -> None:
     """
@@ -42,17 +45,16 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
     Args:
     ----
-        trainer_name (str): _description_
-        trainer_code (str): _description_
+        trainer_name (str): Trainer name. Same as Discord username.
+        trainer_code (str): Trainer primary key. Same as Discord inner id.
 
     Raises:
     ------
-        NonExistingElementError: _description_
-        NonExistingElementError: _description_
+        NonExistingElementError: Raise if there is no trainer table set.
 
     """
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -68,26 +70,23 @@ def create_trainer(trainer_name: str, trainer_code: str) -> None:
 
 def read_trainer(trainer_code: str) -> Any | None:
     """
-    Get data of a trainer by its code.
+    Get trainer from database by its ID.
 
     Args:
     ----
-        trainer_code (str): _description_
+        trainer_code (str): Trainer ID.
 
     Raises:
     ------
-        NonExistingElementError: _description_
-        NonExistingElementError: _description_
+        NonExistingElementError: Raises if no Trainer table is set.
 
     Returns:
     -------
-        _type_: _description_
+        Any: Trainer with the given id.
 
     """
-    if not DATABASE:
-        raise NonExistingElementError()
     if not TRAINER_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -101,67 +100,6 @@ def read_trainer(trainer_code: str) -> Any | None:
         return cursor.fetchone()
 
 
-def update_trainer(trainer_code: str, trainer_name: str) -> None:
-    """
-    Update trainer data by its code.
-
-    Args:
-    ----
-        trainer_code (str): _description_
-        trainer_name (str): _description_
-
-    Raises:
-    ------
-        NonExistingElementError: _description_
-        NonExistingElementError: _description_
-
-    """
-    if not TRAINER_TABLE:
-        raise NonExistingElementError()
-
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            f"""
-        UPDATE {TRAINER_TABLE}
-            SET trainer_name = ?,
-                enabled = 1
-            WHERE trainer_code = '?'
-        """,  # noqa: S608 - Ignored because user cannot insert values to make SQL Injection and I want the possibility to change table name with .env
-            (trainer_name, trainer_code),
-        )
-    cursor.fetchall()
-
-
-def delete_trainer(trainer_code: str) -> None:
-    """
-    Disable a trainer.
-
-    Args:
-    ----
-        trainer_code (str): _description_
-
-    Raises:
-    ------
-        NonExistingElementException: _description_
-        NonExistingElementException: _description_
-
-    """
-    if not TRAINER_TABLE:
-        raise NonExistingElementError()
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            f"""
-            UPDATE {TRAINER_TABLE}
-                SET 'enabled' = 0
-            WHERE trainer_code = ?
-            """,  # noqa: S608 - Ignored because user cannot insert values to make SQL Injection and I want the possibility to change table name with .env
-            (trainer_code),
-        )
-        cursor.fetchall()
-
-
 def create_pokemon(poke: Pokemon) -> None:
     """
     Insert a Pokémon in database.
@@ -172,13 +110,20 @@ def create_pokemon(poke: Pokemon) -> None:
 
     Raises:
     ------
-        NonExistingElementException: Raise when DATABASE not in .env
         NonExistingElementException: Raise when POKEMON_TABLE not in .env
 
     """
     if not POKEMON_TABLE:
-        raise NonExistingElementError()
+        raise NonExistingElementError
 
+    logger.debug(poke.name)
+    logger.debug(poke.first_type)
+    logger.debug(poke.second_type)
+    logger.debug(poke.author_code)
+    logger.debug(poke.moves_list)
+    for move in poke.moves_list:
+        logger.debug("Move: %s, type: %s", move, type(move))
+    logger.debug(poke.nature_name)
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -195,21 +140,21 @@ INSERT INTO {POKEMON_TABLE} (
                         Naturaleza
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """,
+        """,  # noqa: S608
             (
                 poke.name,
                 poke.first_type,
                 poke.second_type,
                 poke.author_code,
+                poke.moves_list[0],
                 poke.moves_list[1],
                 poke.moves_list[2],
                 poke.moves_list[3],
-                poke.moves_list[4],
-                poke.nature,
+                poke.nature_name,
             ),
         )
         conn.commit()
-        print("Pokemon inserted")
+        logger.info("Pokemon inserted")
 
 
 def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
@@ -249,8 +194,7 @@ def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
             """,
                 (trainer_code,),
             )
-            ret = [Pokemon.from_tuple(row) for row in cursor.fetchall()]
-            return ret
+            return cursor.fetchall()
 
         except sqlite3.Error as e:
             raise e
@@ -280,7 +224,7 @@ def create_database():
 );
 """)
         except sqlite3.OperationalError:
-            pass  # TODO: Add info message
+            logger.error("There was an error creating the %s table", TRAINER_TABLE)
 
         try:
             cursor.execute(f"""
@@ -300,6 +244,6 @@ def create_database():
 );
 """)
         except sqlite3.OperationalError:
-            pass
+            logger.error("There was an error creating %s table", POKEMON_TABLE)
 
         conn.commit()

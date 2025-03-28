@@ -5,6 +5,7 @@ This module makes a request to PokeAPI and uses its info to generate
 a random Pokémon.
 """
 
+import enum
 import logging
 from secrets import randbelow
 from typing import Any
@@ -18,6 +19,21 @@ from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
 from frikibot.variety_data import VarietyData
 
+
+class RequestTypes(enum.StrEnum):
+    """
+    Types of requests.
+
+    Each type refers to the "intention" of the request.
+    (i.e: If there is a request to get all the varieties, its type should be 'VARIETIES')
+    """
+
+    VARIETIES = "VARIETIES"
+    DETAILED_VARIETY = "DETAILED_VARIETY"
+    NATURES_LIST = "NATURES_LIST"
+    RANDOM_NATURE = "RANDOM_NATURE"
+
+
 logging.basicConfig(
     level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s"
 )
@@ -25,14 +41,12 @@ logger = logging.getLogger(name="PkGenerator")
 
 
 def _get_natures_list() -> list[dict[str, str]] | None:
-    try:
-        response = requests.get(
-            "https://pokeapi.co/api/v2/nature?limit=25", timeout=TIMEOUT
-        )
-        if response.status_code == 200:
-            return response.json()["results"]
-    except requests.ConnectionError as exc:
-        logger.error("There was an error obtaining the natures: %s", exc)
+    response = try_make_http_get(
+        "https://pokeapi.co/api/v2/nature?limit=25", RequestTypes.NATURES_LIST
+    )
+
+    if response is not None:
+        return response.json()["results"]
     return None
 
 
@@ -40,15 +54,47 @@ def _fetch_random_nature() -> dict:
     if NATURES is None:
         return {}
 
-    nature = NATURES[randbelow(len(NATURES))]["url"]
+    nature_url = NATURES[randbelow(len(NATURES))]["url"]
+
+    response = try_make_http_get(nature_url, RequestTypes.RANDOM_NATURE)
+
+    if response is None:
+        return {}
+    return response.json()
+
+
+def try_make_http_get(url: str, request_type: RequestTypes) -> requests.Response | None:
+    """
+    Make a HTTP GET request and return its result.
+
+    Args:
+    ----
+        url(str): URL which will receive the request.
+        request_type(RequestTypes): Type of request.
+
+    Returns:
+    -------
+        requests.Response | None: Request result. None if error.
+
+    """
     try:
-        if NATURES:
-            response = requests.get(nature, timeout=TIMEOUT)
-            if response.status_code == 200:
-                return response.json()
+        response = requests.get(url, timeout=TIMEOUT)
+        if response.status_code == 200:
+            return response
+        raise requests.ConnectionError(f"Status code not valid {response.status_code}")
     except requests.ConnectionError as exc:
-        logger.error("There was an error trying to get the nature: %s \n ", nature, exc)
-    return {}
+        logger.error(
+            "Connection error happened when doing a request: %s | Type: %s",
+            exc,
+            request_type,
+        )
+    except requests.Timeout as exc:
+        logger.error(
+            "Timeout error happened when doing a request: %s | Type: %s",
+            exc,
+            request_type,
+        )
+    return None
 
 
 NATURES = _get_natures_list()
@@ -78,7 +124,7 @@ def get_moves_string(moves_list: list[str]) -> str:
 
     ret += "```"
 
-    logger.info("Moves: ", ", ".join(moves_list))
+    logger.info("Moves: %s", ", ".join(moves_list))
     return ret
 
 
@@ -126,7 +172,7 @@ def get_message(color: str, ctx: commands.Context[Any]) -> str:
     return message
 
 
-def get_varieties(pokemon_index: int) -> list[Any]:
+def get_varieties(pokemon_index: int) -> list[Any] | None:
     """
     Request varietites of a Pokémon.
 
@@ -136,7 +182,7 @@ def get_varieties(pokemon_index: int) -> list[Any]:
 
     Returns:
     -------
-        list[Any]: List of varieties
+        list[Any] | None: List of varieties
 
     Raises:
     ------
@@ -144,22 +190,13 @@ def get_varieties(pokemon_index: int) -> list[Any]:
         requests.Timeout: When connection exceeds timeout
 
     """
-    try:
-        response = requests.get(
-            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-            timeout=TIMEOUT,
-        )
-        if response.status_code != 200:
-            logger.error("Status code unexpected for index (%s)", pokemon_index)
-            raise requests.exceptions.ConnectionError
+    response = try_make_http_get(
+        f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+        RequestTypes.VARIETIES,
+    )
+    if response is not None:
         return response.json()["varieties"]
-    except requests.Timeout as exc:
-        logger.error("Timeout error happened trying to get the varieties: %s", exc)
-        raise exc
-
-    except requests.ConnectionError as exc:
-        logger.error("Connection exception trying to get Pokémon varieties: %s", exc)
-        raise exc
+    return None
 
 
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
@@ -178,13 +215,22 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-    try:
-        varieties = get_varieties(pokemon_index)
-    except (requests.ConnectionError, requests.Timeout):
+    varieties = get_varieties(pokemon_index)
+    if varieties is None:
         return discord.Embed(title="Error generating Pokémon data")
 
     variety = varieties[randbelow(len(varieties))]
+
     detailed_variety = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+
+    detailed_variety = try_make_http_get(
+        variety["pokemon"]["url"], RequestTypes.DETAILED_VARIETY
+    )
+
+    if detailed_variety is None:
+        return discord.Embed(title="Error generating Pokémon data")
+
+    detailed_variety = detailed_variety.json()
 
     data = VarietyData(
         available_abilities=detailed_variety["abilities"],

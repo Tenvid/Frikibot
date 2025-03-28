@@ -185,7 +185,8 @@ def test_get_varieties_request_code_is_not_200(mock_get: MagicMock, caplog):
         == "Error generating Pokémon data"
     )
 
-    assert "Connection exception trying to get Pokémon varieties:" in caplog.text
+    assert "Status code not valid 404" in caplog.text
+    assert "Type: VARIETIES" in caplog.text
 
 
 @patch("requests.get")
@@ -196,7 +197,7 @@ def test_get_varieties_when_connection_error(mock_get: MagicMock, caplog):
         pokemon_generator.build_embed("normal", MagicMock()).title
         == "Error generating Pokémon data"
     )
-    assert "Connection exception trying to get Pokémon varieties:" in caplog.text
+    assert "Type: VARIETIES" in caplog.text
 
 
 @patch("requests.get")

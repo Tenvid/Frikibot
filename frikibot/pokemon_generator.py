@@ -14,236 +14,71 @@ import requests
 from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
+from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
-from frikibot.stats import Stats
+from frikibot.variety_data import VarietyData
 
-bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
-
-MAX_INDEX = 1010
-
-TIMEOUT = 10
-
-logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
+logging.basicConfig(
+    level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s"
+)
 logger = logging.getLogger(name="PkGenerator")
 
-NAME_REPLACEMENTS = {
-    "gmax": "gigantamax",
-    "alola": "alolan",
-    "hisui": "hisuian",
-    "paldea": "paldean",
-    "galar": "galarian",
-}
+
+def _get_natures_list() -> list[dict[str, str]] | None:
+    try:
+        response = requests.get(
+            "https://pokeapi.co/api/v2/nature?limit=25", timeout=TIMEOUT
+        )
+        if response.status_code == 200:
+            return response.json()["results"]
+    except requests.ConnectionError as exc:
+        logger.error("There was an error obtaining the natures: %s", exc)
+    return None
 
 
-def get_stats_string(
-    pokemon_name: str, modified_stats: tuple[str | None, str | None]
-) -> str:
+def _fetch_random_nature() -> dict:
+    if NATURES is None:
+        return {}
+
+    nature = NATURES[randbelow(len(NATURES))]["url"]
+    try:
+        if NATURES:
+            response = requests.get(nature, timeout=TIMEOUT)
+            if response.status_code == 200:
+                return response.json()
+    except requests.ConnectionError as exc:
+        logger.error("There was an error trying to get the nature: %s \n ", nature, exc)
+    return {}
+
+
+NATURES = _get_natures_list()
+
+
+def get_moves_string(moves_list: list[str]) -> str:
     """
-    Return the ansi string of the stats of the Pokémon.
+    Generate a string with the moves of the Pokémon from the possible ones.
 
     Args:
     ----
-        pokemon_name (str): Name of the Pokémon
-        modified_stats (tuple[str | None, str | None]): Tuple with modified stats names
-
-    Returns:
-    -------
-        str: String of the stats in ansi format
-
-    """
-    stats = get_pokemon_stats(pokemon_name, modified_stats)
-
-    return "```ansi\n" + str(stats) + "```"
-
-
-def get_pokemon_stats(name: str, modified_stats: tuple[str | None, str | None]) -> Stats:
-    """
-    Get the stats of the Pokémon and return it in a dict.
-
-    Args:
-    ----
-        name (str): Name of the Pokémon
-        decreased_stat (str): Name of the stat whose value is decreased by nature
-        modified_stats (tuple[str | None, str | None]): Tuple with modified stats names
-
-
-    Returns:
-    -------
-        Stats: Stats of the pokemon
-
-    """
-    stats = requests.get(
-        f"https://pokeapi.co/api/v2/pokemon/{name.replace('-gmax', '')}",
-        timeout=TIMEOUT,
-    ).json()["stats"]
-
-    stat_values = []
-    for stat in stats:
-        stat_values.append(stat["base_stat"])
-
-    return Stats(
-        stat_values[0],
-        stat_values[1],
-        stat_values[2],
-        stat_values[3],
-        stat_values[4],
-        stat_values[5],
-        modified_stats[0],
-        modified_stats[1],
-    )
-
-
-def get_moves_string(name: str) -> str:
-    """
-    Generate string with the moves of the Pokémon from the possible ones.
-
-    Args:
-    ----
-        name (str): Pokémon name
+        moves_list (list[str]): List with raw names of moves
 
     Returns:
     -------
         str: String with moves in a list form
 
     """
-    moves = get_pokemon_moves(name)
-
+    moves_list = [move.replace("-", " ").capitalize() for move in moves_list]
     ret = "```\n"
 
-    for move in moves:
+    for move in moves_list:
         ret += f"{move}"
-        if move == moves[-1]:
+        if move == moves_list[-1]:
             break
         ret += "\n"
 
     ret += "```"
 
-    logger.info(f"Moves: {', '.join(moves)}")
-    return ret
-
-
-def eliminate_invalid_forms(varieties: list[dict[Any, Any]]) -> str:
-    """
-    Pick a random variety and correct name to get Pokémon image.
-
-    Args:
-    ----
-        varieties (Dict): List of different forms of the Pokémon
-
-    Returns:
-    -------
-        str: Pokémon name with the correct format
-
-    """
-    variety = varieties[randbelow(len(varieties))]
-
-    ret_name = str(variety["pokemon"]["name"])
-
-    return correct_name(ret_name, varieties, variety)
-
-
-def correct_name(
-    name: str,
-    varieties: list[dict[Any, Any]],
-    variety: dict[Any, Any],
-) -> str:
-    """
-    Fix Pokémon names that cause error getting image url and re-format Pokémon name.
-
-    Args:
-    ----
-        name (str): Name of the Pokémon
-        varieties (List[Dict]): All Pokémon varieties
-        variety (Dict): Picked variety
-
-    Returns:
-    -------
-        str: Pokémon name with the correct format
-
-    """
-    if "pikachu" in name:
-        if 1 <= varieties.index(variety) <= 6 or varieties.index(variety) == 14:
-            return eliminate_invalid_forms(varieties)
-
-    if "minior" in name:
-        if "meteor" in name:
-            name = "minior-meteor"
-
-        else:
-            name += "-core"
-
-    name = correct_suffixes(name)
-
-    return name
-
-
-def correct_suffixes(name: str) -> str:
-    """
-    Replace all possible suffixes in Pokémon name.
-
-    Args:
-    ----
-        name (str): Pokémon name
-
-    Returns:
-    -------
-        str: Pokémon name with correct suffixes
-
-    """
-    for rep in NAME_REPLACEMENTS:
-        name = name.replace(rep, NAME_REPLACEMENTS[rep])
-
-    return name
-
-
-def get_random_move(moves: list[dict[Any, Any]]) -> str:
-    """
-    Get a random move from all the available.
-
-    Args:
-    ----
-        moves (List[Dict]): All possible moves
-
-    Returns:
-    -------
-        str: Random selected move name
-
-    """
-    return str(
-        moves[randbelow(len(moves))]["move"]["name"].replace("-", " ").capitalize(),
-    )
-
-
-def get_pokemon_moves(name: str) -> list[str]:
-    """
-    Generate four random moves from the possible ones of the Pokémon to learn.
-
-    Args:
-    ----
-        name (str): Pokémon name
-
-    Returns:
-    -------
-        List[str]: List of Pokémon moves
-
-    """
-    ret: list = []
-
-    name = name.replace("-gmax", "")
-
-    url = f"https://pokeapi.co/api/v2/pokemon/{name}"
-
-    response = requests.get(url, timeout=TIMEOUT)
-
-    json_response = response.json()
-
-    moves = json_response["moves"]
-
-    while len(ret) < 4:
-        move = get_random_move(moves)
-
-        if move not in ret:
-            ret.append(move)
+    logger.info("Moves: ", ", ".join(moves_list))
     return ret
 
 
@@ -262,8 +97,7 @@ def generate_random_pokemon(
         Tuple[discord.Embed, str]: Discord embed and message text
 
     """
-    color = "shiny" if randbelow(101) <= 10 else "normal"
-
+    color = "shiny" if randbelow(101) <= 10 else "default"
     embed = build_embed(color, ctx)
 
     message = get_message(color, ctx)
@@ -292,126 +126,45 @@ def get_message(color: str, ctx: commands.Context[Any]) -> str:
     return message
 
 
-def get_changed_stats(nature: dict[Any, Any] | None) -> tuple[str | None, str | None]:
+def get_varieties(pokemon_index: int) -> list[Any]:
     """
-    Get two stats which are modified by selected nature.
+    Request varietites of a Pokémon.
 
     Args:
     ----
-        nature (Dict): Chosen nature
+        pokemon_index: Pokédex number of the Pokémon
 
     Returns:
     -------
-        Tuple[str | None, str | None]: Decreased and increased stat
-            None if neutral nature
-
-    """
-    if nature:
-        try:
-            decreased = nature["decreased_stat"]["name"]
-            increased = nature["increased_stat"]["name"]
-        except TypeError:
-            decreased = None
-            increased = None
-    else:
-        logger.info("Nature is none, so stats will not be modified")
-        decreased = None
-        increased = None
-
-    logger.info(f"Decreased stat: {decreased}")
-    logger.info(f"Increased stat: {increased}")
-
-    return decreased, increased
-
-
-def get_nature() -> dict[Any, Any] | None:
-    """
-    Get a random nature.
-
-    Returns
-    -------
-        Dict: Nature object
-
-    """
-    try:
-        natures = requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT).json()
-    except requests.ConnectionError:
-        logger.error("Error trying to get natures list")
-        return None
-
-    nature = pick_nature(natures)
-
-    logger.info(f"Nature: {nature['name']}")
-    return nature
-
-
-def pick_nature(natures: dict[Any, Any]) -> dict[Any, Any]:
-    """
-    Get a random nature and return its json.
-
-    Args:
-    ----
-        natures (dict[Any, Any]): All possible natures
-
-    Returns:
-    -------
-        Dict: Nature object
-
-    """
-    random_nature = natures["results"][randbelow(len(natures["results"]))]
-    detailed_nature = requests.get(random_nature["url"], timeout=TIMEOUT)
-
-    return detailed_nature.json()
-
-
-def generate_pokemon_types(variety: dict[Any, Any]) -> list[dict[Any, Any]] | None:
-    """
-    Get types of a given Pokémon variety.
-
-    Args:
-    ----
-        variety (dict): Pokémon data dict
-
-    Returns:
-    -------
-        list | None: List of types, None if error
-
-    """
-    try:
-        response = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
-        return list[dict[Any, Any]](response["types"])
-
-    except KeyError:
-        logger.error("Types could not be obtained.")
-        return None
-
-
-def get_pokemon_ability(variety: dict) -> str:
-    """
-    Pick a nature from the available for the Pokémon.
-
-    Args:
-    ----
-        variety (dict): Pokémon data
+        list[Any]: List of varieties
 
     Raises:
     ------
-        TypeError: Raises if variety is not a dict
-
-    Returns:
-    -------
-        str: Ability name
+        requests.ConnectionError: When status_code is not 200 or an error
+        requests.Timeout: When connection exceeds timeout
 
     """
-    if not isinstance(variety, dict):
-        raise TypeError(f"Variety is not a dict, is of type {type(variety)}")
+    try:
+        response = requests.get(
+            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
+            timeout=TIMEOUT,
+        )
+        if response.status_code != 200:
+            logger.error("Status code unexpected for index (%s)", pokemon_index)
+            raise requests.exceptions.ConnectionError
+        return response.json()["varieties"]
+    except requests.Timeout as exc:
+        logger.error("Timeout error happened trying to get the varieties: %s", exc)
+        raise exc
 
-    return variety["abilities"][randbelow(len(variety["abilities"]))]["ability"]["name"]
+    except requests.ConnectionError as exc:
+        logger.error("Connection exception trying to get Pokémon varieties: %s", exc)
+        raise exc
 
 
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
-    Create an Embed from Discord.
+    Create embed message to display all data.
 
     Args:
     ----
@@ -426,96 +179,79 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
     try:
-        varieties: list[Any] = requests.get(
-            f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-            timeout=TIMEOUT,
-        ).json()["varieties"]
-    except requests.ConnectionError:
-        logger.error("Timeout exception trying to get Pokémon varieties")
+        varieties = get_varieties(pokemon_index)
+    except (requests.ConnectionError, requests.Timeout):
         return discord.Embed(title="Error generating Pokémon data")
 
     variety = varieties[randbelow(len(varieties))]
+    detailed_variety = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
 
-    pokemon_name = variety["pokemon"]["name"]
-
-    ability = get_pokemon_ability(
-        requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
+    data = VarietyData(
+        available_abilities=detailed_variety["abilities"],
+        available_moves=detailed_variety["moves"],
+        combat_stats=detailed_variety["stats"],
+        name=detailed_variety["name"],
+        sprite=detailed_variety["sprites"]["other"]["home"][f"front_{color}"],
+        types=detailed_variety["types"],
     )
 
-    nature = get_nature()
+    logger.info("VarietyData created")
 
-    moves_string = get_moves_string(pokemon_name)
-
-    stats_string = (
-        "```ansi\n"
-        + str(get_pokemon_stats(pokemon_name, get_changed_stats(nature)))
-        + "```"
+    pokemon_entity = Pokemon(
+        name=data.name,
+        list_index=pokemon_index,
+        author_code=str(ctx.author.id),
+        nature=_fetch_random_nature(),
+        first_type=data.types[0]["type"]["name"],
+        second_type=data.types[1]["type"]["name"] if len(data.types) > 1 else "none",
+        available_moves=data.available_moves,
+        available_abilities=data.available_abilities,
+        stats_data=data.combat_stats,
     )
+
+    logger.info("Pokemon created")
 
     embed = _generate_embed(
-        color,
-        pokemon_index,
-        varieties,
-        variety,
-        pokemon_name,
-        nature,
-        moves_string,
-        stats_string,
-        ability,
+        pokemon_entity.pokedex_number,
+        pokemon_entity.name,
+        pokemon_entity.nature,
+        get_moves_string(pokemon_entity.moves_list),
+        str(pokemon_entity.stats),
+        pokemon_entity.ability,
+        data.sprite,
     )
 
-    types = generate_pokemon_types(variety)
-
-    create_pokemon(
-        Pokemon(
-            name=pokemon_name,
-            list_index=pokemon_index,
-            moves_list=moves_string.replace("```", "").split("\n"),
-            nature=nature["name"] if nature else "None",
-            first_type=types[0]["type"]["name"] if types else "none",
-            second_type=types[1]["type"]["name"] if types and len(types) > 1 else "none",
-            author_code=str(ctx.author.id),
-        ),
-    )
-
-    logger.info(msg="Embed title set")
-
+    create_pokemon(pokemon_entity)
+    logger.info("Pokemon added to database")
     return embed
 
 
 def _generate_embed(
-    color,
     pokemon_index,
-    varieties,
-    variety,
     pokemon_name,
     nature,
     moves_string,
     stats_string,
     ability,
+    sprite,
 ):
-    ret = discord.Embed()
-
-    ret.set_image(
-        url=f"https://img.pokemondb.net/sprites/home/{color}/"
-        f"{correct_name(pokemon_name, varieties=varieties, variety=variety)}.png",
+    embed = (
+        discord.Embed(
+            title=f"# {pokemon_index}"
+            f" *{nature['name'].capitalize() if nature else 'Hardy'}*"
+            f" {pokemon_name.capitalize()}",
+            description=f"Ability: {ability.replace('-', ' ').capitalize()}",
+        )
+        .set_image(url=sprite)
+        .add_field(name="Moves", value=moves_string)
+        .add_field(name="Stats", value=stats_string)
     )
 
-    # Pokemon Moves
-
-    ret.add_field(name="Moves", value=moves_string)
-
-    # Pokemon Stats
-
-    ret.add_field(name="Stats", value=stats_string)
-
-    # Pokémon name
-
-    ret.title = (
-        f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}*"
-        f" {pokemon_name.capitalize()}"
-    )
-
-    ret.description = f"Ability: {ability.replace('-', ' ').capitalize()}"
-
-    return ret
+    if sprite is None:
+        embed.add_field(
+            name="Unexpected Sprite",
+            inline=False,
+            value="There is no sprite. That means that this case should not happen."
+            "Please, contact me on GitHub(@Tenvid) so I can fix this. Thank you :)",
+        )
+    return embed

@@ -5,50 +5,65 @@ This module contains the definition for class Stats.
 """
 
 import math
+from logging import getLogger
+
+logger = getLogger("Stats")
 
 
 class Stats:
     """Pokémon stats definition."""
 
-    hp: int
-    attack: int
-    defense: int
-    special_attack: int
-    special_defense: int
-    speed: int
+    hp: int | None = None
+    attack: int | None = None
+    defense: int | None = None
+    special_attack: int | None = None
+    special_defense: int | None = None
+    speed: int | None = None
 
     def __init__(
         self,
-        hp: int,
-        attack: int,
-        defense: int,
-        special_attack: int,
-        special_defense: int,
-        speed: int,
-        decreased: str | None = None,
-        increased: str | None = None,
+        data: list[dict] | None,
+        decreased: dict | None = None,
+        increased: dict | None = None,
+        *,
+        hp: int | None = None,
+        attack: int | None = None,
+        defense: int | None = None,
+        special_attack: int | None = None,
+        special_defense: int | None = None,
+        speed: int | None = None,
     ):
         """
         Pokémon stats constructor.
 
         Args:
         ----
+            data (list[dict]): List of Pokémon stats
             hp (int): Base hp stat
             attack (int): Base attack stat
             defense (int): Base defense stat
             special_attack (int): Base special attack stat
             special_defense (int): Base special defense stat
             speed (int): Base speed stat
-            decreased (str | None, optional): Stat decreased by nature. Defaults to None.
-            increased (str | None, optional): Stat increased by nature. Defaults to None.
+            decreased (dict | None, optional): Stat decreased by nature. Defaults to None.
+            increased (dict | None, optional): Stat increased by nature. Defaults to None.
 
         """
-        self.hp = hp
-        self.attack = attack
-        self.defense = defense
-        self.special_attack = special_attack
-        self.special_defense = special_defense
-        self.speed = speed
+        if data:
+            logger.debug("Stats_data: %s", data)
+            self.hp = data[0]["base_stat"]
+            self.attack = data[1]["base_stat"]
+            self.defense = data[2]["base_stat"]
+            self.special_attack = data[3]["base_stat"]
+            self.special_defense = data[4]["base_stat"]
+            self.speed = data[5]["base_stat"]
+        else:
+            self.hp = hp
+            self.attack = attack
+            self.defense = defense
+            self.special_attack = special_attack
+            self.special_defense = special_defense
+            self.speed = speed
         self.decreased = decreased
         self.increased = increased
 
@@ -61,13 +76,16 @@ class Stats:
             str: Self made string.
 
         """
-        return "\n".join(
+        ret = "```ansi\n"
+        ret += "\n".join(
             [self.add_color_nature(stat_tuple=x) for x in self.get_stats_list()]
         )
+        ret += "```"
+        return ret
 
     def add_color_nature(self, stat_tuple: tuple[str, int]) -> str:
         """
-        Add color to stats modified by nature.
+        Add color to stats.
 
         Args:
         ----
@@ -78,12 +96,16 @@ class Stats:
             str: 'stat_name: stat_value' with color if needed
 
         """
-        if self.decreased and stat_tuple[0] == self.decreased:
+        logger.debug("Blue stat: %s", self.decreased)
+        logger.debug("Red stat: %s", self.increased)
+        logger.debug("Stat tuple: %s", stat_tuple)
+
+        if self.decreased and stat_tuple[0] == self.decreased["name"]:
             return (
                 f"\u001b[0;34m{stat_tuple[0].replace('-', ' ').capitalize()}:"
                 f" {math.floor(stat_tuple[1] * 0.9)}-\u001b[0;0m"
             )
-        if self.increased and stat_tuple[0] == self.increased:
+        if self.increased and stat_tuple[0] == self.increased["name"]:
             return (
                 f"\u001b[0;31m{stat_tuple[0].replace('-', ' ').capitalize()}:"
                 f"{math.floor(stat_tuple[1] * 1.1)}+\u001b[0;0m"

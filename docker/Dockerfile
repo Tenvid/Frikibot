@@ -8,11 +8,11 @@ RUN pip install --no-cache-dir poetry==2.1 && poetry build
 
 FROM python:3.11 AS runtime
 
-COPY --from=builder /app/dist/frikibot-0.1.1.dev0.tar.gz /build/
+COPY --from=builder /app/dist/frikibot-0.1.1.tar.gz /build/
 
 WORKDIR /build
 
-RUN pip install --no-cache-dir frikibot-0.1.1.dev0.tar.gz
+RUN pip install --no-cache-dir frikibot-0.1.1.tar.gz
 
 WORKDIR /app
 

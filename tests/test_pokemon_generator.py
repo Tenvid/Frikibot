@@ -33,6 +33,7 @@ class PokemonBuilder:
             {"base_stat": 0},
             {"base_stat": 0},
         ]
+        self.sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png"
 
     def with_stats(self, stats: list[dict[str, int]]) -> "PokemonBuilder":
         self.stats_data = stats
@@ -53,6 +54,7 @@ class PokemonBuilder:
             list_index=self.list_index,
             nature=self.nature,
             stats_data=self.stats_data,
+            sprite=self.sprite,
         )
 
 
@@ -215,3 +217,9 @@ def test_pokemon_creation_if_error_obtaining_nature():
     assert pokemon.nature_name == "Unknown nature"
     assert pokemon.stats.increased is None
     assert pokemon.stats.decreased is None
+
+
+def test_sprite_should_be_official_artwork():
+    pokemon = PokemonBuilder().build()
+    if pokemon.sprite is not None:
+        assert "official-artwork" in pokemon.sprite

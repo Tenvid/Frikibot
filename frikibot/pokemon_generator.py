@@ -237,7 +237,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         available_moves=detailed_variety["moves"],
         combat_stats=detailed_variety["stats"],
         name=detailed_variety["name"],
-        sprite=detailed_variety["sprites"]["other"]["home"][f"front_{color}"],
+        available_sprites=detailed_variety["sprites"],
         types=detailed_variety["types"],
     )
 
@@ -253,6 +253,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         available_moves=data.available_moves,
         available_abilities=data.available_abilities,
         stats_data=data.combat_stats,
+        sprite=data.get_official_artwork_sprite(color),
     )
 
     logger.info("Pokemon created")
@@ -264,7 +265,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         get_moves_string(pokemon_entity.moves_list),
         str(pokemon_entity.stats),
         pokemon_entity.ability,
-        data.sprite,
+        pokemon_entity.sprite,
     )
 
     create_pokemon(pokemon_entity)

@@ -27,6 +27,7 @@ class Pokemon:
         available_abilities: list[dict],
         available_moves: list[dict],
         stats_data: list[dict],
+        sprite: str | None,
     ):
         """
         Create Pokémon instance.
@@ -43,6 +44,7 @@ class Pokemon:
             available_moves: (list[dict]): Dict with moves info
             stats_data: (list[dict]): List of Pokémon stats
             available_abilities: (list[dict]): List of Pokémon available abilities
+            sprite (str|None): Url of the sprite
 
         """
         logger.debug("Pokemon initalization started.")
@@ -70,6 +72,7 @@ class Pokemon:
         logger.debug("Pokemon moves_list set")
         self.ability = self._get_random_ability(available_abilities)
         logger.debug("Pokemon ability set")
+        self.sprite = sprite
         try:
             self.stats = Stats(
                 stats_data, self.nature["decreased_stat"], self.nature["increased_stat"]

@@ -4,6 +4,13 @@ Script made by David Gómez.
 This module contains a class for Pokémon entities
 """
 
+from logging import getLogger
+from secrets import randbelow
+
+from frikibot.stats import Stats
+
+logger = getLogger("Pokemon")
+
 
 class Pokemon:
     """Pokémon definition."""
@@ -13,11 +20,14 @@ class Pokemon:
         *,
         name: str,
         list_index: int,
-        moves_list: list[str],
-        nature: str,
+        nature: dict,
         first_type: str,
         second_type: str | None,
         author_code: str,
+        available_abilities: list[dict],
+        available_moves: list[dict],
+        stats_data: list[dict],
+        sprite: str | None,
     ):
         """
         Create Pokémon instance.
@@ -31,41 +41,81 @@ class Pokemon:
             first_type (str): Primary type
             second_type (str): Secondary type if there is
             author_code (str): Trainer id
+            available_moves: (list[dict]): Dict with moves info
+            stats_data: (list[dict]): List of Pokémon stats
+            available_abilities: (list[dict]): List of Pokémon available abilities
+            sprite (str|None): Url of the sprite
 
         """
+        logger.debug("Pokemon initalization started.")
         self.name = name
+        logger.debug("Pokemon name set")
         self.pokedex_number = list_index
-        self.moves_list = moves_list
+        logger.debug("Pokemon pokedex_number set")
         self.nature = nature
+        logger.debug("Pokemon nature set")
+        try:
+            self.nature_name = nature["name"]
+            logger.debug("Pokemon nature_name set")
+        except KeyError:
+            self.nature_name = "Unknown nature"
+            logger.warning(
+                "Nature name could not be obtained from given nature: %s", nature
+            )
         self.first_type = first_type
+        logger.debug("Pokemon first_type set")
         self.second_type = second_type
+        logger.debug("Pokemon second_type set")
         self.author_code = author_code
+        logger.debug("Pokemon author_code set")
+        self.moves_list = self._get_pokemon_moves(available_moves)
+        logger.debug("Pokemon moves_list set")
+        self.ability = self._get_random_ability(available_abilities)
+        logger.debug("Pokemon ability set")
+        self.sprite = sprite
+        try:
+            self.stats = Stats(
+                stats_data, self.nature["decreased_stat"], self.nature["increased_stat"]
+            )
+            logger.debug("Pokemon stats set")
+        except KeyError:
+            self.stats = Stats(stats_data, None, None)
+            logger.warning(
+                "Modified stats could not be obtained from nature, defaulting to None."
+            )
 
-    @classmethod
-    def from_tuple(cls: type["Pokemon"], pokemon_data: tuple) -> "Pokemon":
+    def _get_pokemon_moves(self, available_moves: list[dict]) -> list[str]:
         """
-        Generate Pokémon data using tuple data from database.
+        Generate four random moves from the possible ones of the Pokémon to learn.
 
         Args:
         ----
-            pokemon_data (tuple): Pokémon data obtained from database.
+            available_moves (list[dict): List of all moves which this Pokémon can learn.
 
         Returns:
         -------
-            Pokemon: Pokemon instance
+            List[str]: List of Pokémon moves
 
         """
-        return cls(
-            list_index=pokemon_data[0],
-            name=pokemon_data[1],
-            first_type=pokemon_data[2],
-            second_type=pokemon_data[3],
-            author_code=pokemon_data[4],
-            moves_list=[
-                pokemon_data[5],
-                pokemon_data[6],
-                pokemon_data[7],
-                pokemon_data[8],
-            ],
-            nature=pokemon_data[9],
-        )
+        ret: list = []
+        while len(ret) < 4:
+            move = available_moves[randbelow(len(available_moves))]["move"]["name"]
+
+            if move not in ret:
+                ret.append(move)
+        return ret
+
+    def _get_random_ability(self, abilities_list) -> dict:
+        """
+        Pick a random ability from the availables.
+
+        Args:
+        ----
+            abilities_list (list[dict]): List of available abilities
+
+        Returns:
+        -------
+            dict: Chosen ability
+
+        """
+        return abilities_list[randbelow(len(abilities_list))]["ability"]["name"]

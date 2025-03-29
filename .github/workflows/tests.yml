@@ -3,15 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - main
-      - dev
-      - tests
-  pull_request:
-    types: [opened]
-    branches:
-        - main
-        - dev
-        - tests
+    - '**'
 
 jobs:
   Tests:

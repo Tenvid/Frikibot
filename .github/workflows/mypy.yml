@@ -3,14 +3,7 @@ name: Mypy
 on:
   push:
     branches:
-      - main
-      - dev
-  pull_request:
-    types: [opened]
-    branches:
-      - dev
-      - test
-      
+    - '**'
 
 jobs:
   hello:

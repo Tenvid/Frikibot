@@ -11,6 +11,7 @@ import typing
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from global_variables import Loggers
 
 from frikibot import pokemon_generator
 from frikibot.database_handler import (
@@ -31,7 +32,7 @@ bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 
-logger = logging.getLogger("main")
+logger = logging.getLogger(Loggers.MAIN)
 
 
 # Event realised when the bot is connected

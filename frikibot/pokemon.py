@@ -7,9 +7,10 @@ This module contains a class for Pokémon entities
 from logging import getLogger
 from secrets import randbelow
 
+from frikibot.global_variables import Loggers
 from frikibot.stats import Stats
 
-logger = getLogger("Pokemon")
+logger = getLogger(Loggers.POKEMON_CLASS)
 
 
 class Pokemon:

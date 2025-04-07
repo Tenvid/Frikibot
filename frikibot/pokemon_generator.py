@@ -199,6 +199,30 @@ def get_varieties(pokemon_index: int) -> list[Any] | None:
     return None
 
 
+def get_detailed_variety(varieties: list[dict]) -> dict | None:
+    """
+    Get details of a random variety from the available.
+
+    Args:
+    ----
+    varieties (list[dict]): Available varieties
+
+    Returns:
+    -------
+    dict | None: Data of a random variety. None if there was an error.
+
+    """
+    random_variety = varieties[randbelow(len(varieties))]
+
+    response = try_make_http_get(
+        random_variety["pokemon"]["url"], RequestTypes.DETAILED_VARIETY
+    )
+
+    if response is not None:
+        return response.json()
+    return response
+
+
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     """
     Create embed message to display all data.
@@ -216,21 +240,14 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
     pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
     varieties = get_varieties(pokemon_index)
+
     if varieties is None:
         return discord.Embed(title="Error generating Pokémon data")
 
-    variety = varieties[randbelow(len(varieties))]
-
-    detailed_variety = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
-
-    detailed_variety = try_make_http_get(
-        variety["pokemon"]["url"], RequestTypes.DETAILED_VARIETY
-    )
+    detailed_variety = get_detailed_variety(varieties)
 
     if detailed_variety is None:
         return discord.Embed(title="Error generating Pokémon data")
-
-    detailed_variety = detailed_variety.json()
 
     data = VarietyData(
         available_abilities=detailed_variety["abilities"],

@@ -11,7 +11,6 @@ import typing
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from global_variables import Loggers
 
 from frikibot import pokemon_generator
 from frikibot.database_handler import (
@@ -20,6 +19,7 @@ from frikibot.database_handler import (
     read_pokemon_by_trainer,
     read_trainer,
 )
+from frikibot.global_variables import Loggers
 from frikibot.paginated_view import PaginatedView
 
 load_dotenv()

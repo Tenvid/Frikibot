@@ -7,7 +7,9 @@ This module contains the defition for the class VarietyData.
 import logging
 from dataclasses import dataclass
 
-logger = logging.getLogger("VarietyData")
+from frikibot.global_variables import Loggers
+
+logger = logging.getLogger(Loggers.VARIETY_DATA)
 
 
 @dataclass(kw_only=True)

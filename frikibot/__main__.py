@@ -19,7 +19,6 @@ from frikibot.database_handler import (
     read_pokemon_by_trainer,
     read_trainer,
 )
-from frikibot.global_variables import Loggers
 from frikibot.paginated_view import PaginatedView
 
 load_dotenv()
@@ -32,7 +31,7 @@ bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 
-logger = logging.getLogger(Loggers.MAIN)
+logger = logging.getLogger("main")
 
 
 # Event realised when the bot is connected

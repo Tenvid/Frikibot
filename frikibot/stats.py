@@ -7,9 +7,7 @@ This module contains the definition for class Stats.
 import math
 from logging import getLogger
 
-from frikibot.global_variables import Loggers
-
-logger = getLogger(Loggers.STATS)
+logger = getLogger("Stats")
 
 
 class Stats:

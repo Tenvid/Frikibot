@@ -15,7 +15,7 @@ import requests
 from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
-from frikibot.global_variables import MAX_INDEX, TIMEOUT, Loggers
+from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
 from frikibot.variety_data import VarietyData
 
@@ -37,7 +37,7 @@ class RequestTypes(enum.StrEnum):
 logging.basicConfig(
     level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s"
 )
-logger = logging.getLogger(Loggers.POKEMON_GENERATOR)
+logger = logging.getLogger(name="PkGenerator")
 
 
 def _get_natures_list() -> list[dict[str, str]] | None:

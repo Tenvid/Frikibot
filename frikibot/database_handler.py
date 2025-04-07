@@ -7,17 +7,18 @@ This module contains CRUD for Trainers and Pokémon.
 import logging
 import os
 import sqlite3
+from logging import getLogger
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
 
-from frikibot.global_variables import Loggers
 from frikibot.pokemon import Pokemon
 
 load_dotenv()
-logger = logging.getLogger(Loggers.DATABASE_HANDLER)
+logger = getLogger("DB-Handler")
 
+logger = logging.getLogger("Database")
 
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")

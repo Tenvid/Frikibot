@@ -8,11 +8,11 @@ TIMEOUT = 10  # HTTP request timeout
 
 
 class Loggers(StrEnum):
-    """Logger names."""
+        """Logger names."""
 
-    MAIN = "main"
-    STATS = "stats"
-    POKEMON_GENERATOR = "generator"
-    DATABASE_HANDLER = "database-handler"
-    POKEMON_CLASS = "pokemon"
-    VARIETY_DATA = "variety"
+        MAIN = "main"
+        STATS = "stats"
+        POKEMON_GENERATOR = "generator"
+        DATABASE_HANDLER = "database-handler"
+        POKEMON_CLASS = "pokemon"
+        VARIETY_DATA = "variety"

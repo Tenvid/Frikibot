@@ -4,17 +4,17 @@ version = "0.1.1"
 description = ""
 license = { text = "LICENSE" }
 authors = [
-  { name = "David", email = "<89795659+Tenvid@users.noreply.github.com>" },
+        { name = "David", email = "<89795659+Tenvid@users.noreply.github.com>" },
 ]
 readme = "README.md"
 requires-python = ">=3.11, < 3.13"
 
 dependencies = [
-  "python_dotenv (==1.0.1)",
-  "requests (==2.32.2)",
-  "types-requests (==2.32.0.20240712)",
-  "discord-py (==2.3.2)",
-  "sqlalchemy (==2.0.38)",
+        "python_dotenv (==1.0.1)",
+        "requests (==2.32.2)",
+        "types-requests (==2.32.0.20240712)",
+        "discord-py (==2.3.2)",
+        "sqlalchemy (==2.0.38)",
 ]
 
 [project.optional-dependencies]
@@ -36,74 +36,73 @@ poetry-plugin-export = ">=1.8"
 
 [tool.ruff]
 line-length = 90
-indent-width = 4
-# exclude = ["tests"]
+indent-width = 8
 target-version = "py311"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "D"]
+"tests/**/*.py" = ["S101", "D", "E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 
 [tool.ruff.lint]
 select = [
-  "E",
-  "F",
-  "D",
-  "W2",
-  "W391",
-  "W505",
-  "I",
-  "UP006",
-  "UP007",
-  "UP008",
-  "UP015",
-  "UP032",
-  "UP035",
-  "UP037",
-  "UP039",
-  "UP042",
-  "S",
-  "BLE",
-  "FBT",
-  "B",
-  "A",     # Keywords shadowing
-  "COM",   # Trailing commas
-  "C4",    # List comprehensions
-  "DTZ",   # Datetime
-  "ISC",   # Implicit string concatenation
-  "ICN",   # Import conventions
-  "LOG",   # Logging rules
-  "G",     # Logging rules
-  "PIE",   # Avoid unnecessary code
-  "T20",   # Do not use print or pprint
-  "PYI",
-  "PT",
-  "Q",
-  "RSE",
-  "RET",
-  "SLF",
-  "SIM",
-  "SLOT",
-  "TID",
-  "TD",
-  "ARG",
-  "PTH",
-  "FLY",
-  "C90",
-  "N",
-  "PERF",
-  "W",
+        "E",
+        "F",
+        "D",
+        "W2",
+        "W391",
+        "W505",
+        "I",
+        "UP006",
+        "UP007",
+        "UP008",
+        "UP015",
+        "UP032",
+        "UP035",
+        "UP037",
+        "UP039",
+        "UP042",
+        "S",
+        "BLE",
+        "FBT",
+        "B",
+        "A",     # Keywords shadowing
+        "COM",   # Trailing commas
+        "C4",    # List comprehensions
+        "DTZ",   # Datetime
+        "ISC",   # Implicit string concatenation
+        "ICN",   # Import conventions
+        "LOG",   # Logging rules
+        "G",     # Logging rules
+        "PIE",   # Avoid unnecessary code
+        "T20",   # Do not use print or pprint
+        "PYI",
+        "PT",
+        "Q",
+        "RSE",
+        "RET",
+        "SLF",
+        "SIM",
+        "SLOT",
+        "TID",
+        "TD",
+        "ARG",
+        "PTH",
+        "FLY",
+        "C90",
+        "N",
+        "PERF",
+        "W",
 ]
 
 ignore = [
-  "D203",   # Empty line between class declaration and docstring
-  "D212",   # Docstring summary in first line
-  "ICN003", # Prohibit 'from' in import
-  "COM812", # Conflict with ISC001 | Checks for absensce of trailing commas
-  "TD002",
-  "TD003",
+        "D203",   # Empty line between class declaration and docstring
+        "D212",   # Docstring summary in first line
+        "ICN003", # Prohibit 'from' in import
+        "COM812", # Conflict with ISC001 | Checks for absensce of trailing commas
+        "TD002",
+        "TD003",
 ]
 
 [tool.pytest.ini_options]

@@ -1,10 +1,10 @@
 from unittest.mock import MagicMock, patch
 
 import requests
+from domain.pokemon import Pokemon
 
 from frikibot import pokemon_generator
-from frikibot.pokemon import Pokemon
-from frikibot.stats import Stats
+from frikibot.domain.stats import Stats
 
 
 class PokemonBuilder:

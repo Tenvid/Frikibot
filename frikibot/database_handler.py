@@ -39,35 +39,6 @@ class NonExistingElementError(Exception):
     """Raise when an element is missing."""
 
 
-def create_trainer(trainer_name: str, trainer_code: str) -> None:
-    """
-    Insert trainer in database.
-
-    Args:
-    ----
-        trainer_name (str): Trainer name. Same as Discord username.
-        trainer_code (str): Trainer primary key. Same as Discord inner id.
-
-    Raises:
-    ------
-        NonExistingElementError: Raise if there is no trainer table set.
-
-    """
-    if not TRAINER_TABLE:
-        raise NonExistingElementError
-
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            f"INSERT INTO {TRAINER_TABLE}"  # noqa: S608
-            "(trainer_name, trainer_code, enabled) VALUES (?, ?, 1)",  # noqa: S608
-            # Ignored because user cannot insert values to make SQL
-            # Injection and I want the possibility to change table name with .env
-            (trainer_name, trainer_code),
-        )
-        conn.commit()
-
-
 def read_trainer(trainer_code: str) -> Any | None:
     """
     Get trainer from database by its ID.

@@ -15,11 +15,11 @@ from dotenv import load_dotenv
 from frikibot import pokemon_generator
 from frikibot.database_handler import (
     create_database,
-    create_trainer,
     read_pokemon_by_trainer,
     read_trainer,
 )
 from frikibot.domain.paginated_view import PaginatedView
+from frikibot.infrastructure.sqlite3_trainer_repository import SQLite3TrainerRepository
 
 load_dotenv()
 
@@ -32,6 +32,8 @@ bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 
 logger = logging.getLogger("main")
+
+trainer_repository = SQLite3TrainerRepository()
 
 
 # Event realised when the bot is connected
@@ -56,8 +58,8 @@ async def pokemon(
     """
     embed, message = pokemon_generator.generate_random_pokemon(ctx)
     if not read_trainer(str(ctx.author.id)):
+        trainer_repository.add(ctx.author.name, str(ctx.author.id))
         logger.info("Trainer added")
-        create_trainer(ctx.author.name, str(ctx.author.id))
     await ctx.send(message, embed=embed)
 
 

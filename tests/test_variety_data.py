@@ -1,6 +1,6 @@
 from typing import Any
 
-from frikibot.variety_data import VarietyData
+from frikibot.domain.variety_data import VarietyData
 
 
 class VarietyDataBuilder:

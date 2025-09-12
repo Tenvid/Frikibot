@@ -17,7 +17,7 @@ from discord.ext import commands
 from frikibot.constants import MAX_INDEX, TIMEOUT
 from frikibot.database_handler import create_pokemon
 from frikibot.domain.pokemon import Pokemon
-from frikibot.variety_data import VarietyData
+from frikibot.domain.variety_data import VarietyData
 
 
 class RequestTypes(enum.StrEnum):

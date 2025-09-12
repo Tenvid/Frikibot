@@ -14,10 +14,10 @@ import discord
 import requests
 from discord.ext import commands
 
-from frikibot.constants import MAX_INDEX, TIMEOUT
 from frikibot.database_handler import create_pokemon
 from frikibot.domain.pokemon import Pokemon
 from frikibot.domain.variety_data import VarietyData
+from frikibot.shared.constants import MAX_INDEX, TIMEOUT
 
 
 class RequestTypes(enum.StrEnum):

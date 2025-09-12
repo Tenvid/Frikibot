@@ -15,8 +15,8 @@ import requests
 from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
+from frikibot.domain.pokemon import Pokemon
 from frikibot.global_variables import MAX_INDEX, TIMEOUT
-from frikibot.pokemon import Pokemon
 from frikibot.variety_data import VarietyData
 
 

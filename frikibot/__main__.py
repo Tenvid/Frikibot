@@ -19,7 +19,7 @@ from frikibot.database_handler import (
     read_pokemon_by_trainer,
     read_trainer,
 )
-from frikibot.paginated_view import PaginatedView
+from frikibot.domain.paginated_view import PaginatedView
 
 load_dotenv()
 

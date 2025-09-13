@@ -1,25 +1,12 @@
 """SQLite3 implementation of the TrainerRepository."""
 
-import os
 import sqlite3
-from pathlib import Path
 from typing import Any
+
+from shared.constants import DATABASE, TRAINER_TABLE
 
 from frikibot.domain.trainer_repository import TrainerRepository
 from frikibot.shared.exceptions import NonExistingElementError
-
-TRAINER_TABLE = os.getenv("TRAINER_TABLE")
-DATABASE_FOLDER: Path = Path(
-    str(os.getenv("DATABASE_FOLDER")) if os.getenv("DATABASE_FOLDER") else "db"
-)
-DATABASE: Path = Path(
-    DATABASE_FOLDER / str(os.getenv("DATABASE"))
-    if os.getenv("DATABASE")
-    else "pokemon.db"
-)
-
-if not DATABASE_FOLDER.exists():
-    DATABASE_FOLDER.mkdir()
 
 
 class SQLite3TrainerRepository(TrainerRepository):

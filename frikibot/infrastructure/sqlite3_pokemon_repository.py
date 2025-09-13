@@ -1,30 +1,14 @@
 """SQLite3 implementation of PokemonRepository."""
 
 import logging
-import os
 import sqlite3
-from pathlib import Path
 
-from domain.pokemon import Pokemon
-
+from frikibot.domain.pokemon import Pokemon
 from frikibot.domain.pokemon_repository import PokemonRepository
+from frikibot.shared.constants import DATABASE, POKEMON_TABLE
 from frikibot.shared.exceptions import NonExistingElementError
 
-POKEMON_TABLE = os.getenv("POKEMON_TABLE")
-
 logger = logging.getLogger(__name__)
-
-DATABASE_FOLDER: Path = Path(
-    str(os.getenv("DATABASE_FOLDER")) if os.getenv("DATABASE_FOLDER") else "db"
-)
-DATABASE: Path = Path(
-    DATABASE_FOLDER / str(os.getenv("DATABASE"))
-    if os.getenv("DATABASE")
-    else "pokemon.db"
-)
-
-if not DATABASE_FOLDER.exists():
-    DATABASE_FOLDER.mkdir()
 
 
 class SQLite3PokemonRepository(PokemonRepository):
@@ -44,6 +28,7 @@ class SQLite3PokemonRepository(PokemonRepository):
 
         """
         if not POKEMON_TABLE:
+            logger.error("No POKEMON_TABLE defined in .env")
             raise NonExistingElementError
 
         logger.debug(poke.name)

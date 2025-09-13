@@ -270,6 +270,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         pokemon_entity.sprite,
     )
 
+    logger.info("Embed created")
     pokemon_repository.add(pokemon_entity)
     logger.info("Pokemon added to database")
     return embed

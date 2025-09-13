@@ -5,31 +5,17 @@ This module contains CRUD for Trainers and Pokémon.
 """
 
 import logging
-import os
 import sqlite3
 from logging import getLogger
-from pathlib import Path
 
 from dotenv import load_dotenv
+
+from frikibot.shared.constants import DATABASE, POKEMON_TABLE, TRAINER_TABLE
 
 load_dotenv()
 logger = getLogger("DB-Handler")
 
 logger = logging.getLogger("Database")
-
-POKEMON_TABLE = os.getenv("POKEMON_TABLE")
-TRAINER_TABLE = os.getenv("TRAINER_TABLE")
-DATABASE_FOLDER: Path = Path(
-    str(os.getenv("DATABASE_FOLDER")) if os.getenv("DATABASE_FOLDER") else "db"
-)
-DATABASE: Path = Path(
-    DATABASE_FOLDER / str(os.getenv("DATABASE"))
-    if os.getenv("DATABASE")
-    else "pokemon.db"
-)
-
-if not DATABASE_FOLDER.exists():
-    DATABASE_FOLDER.mkdir()
 
 
 def create_database():

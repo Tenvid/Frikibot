@@ -56,8 +56,11 @@ async def pokemon(
     """
     embed, message = pokemon_generator.generate_random_pokemon(ctx)
     if not trainer_repository.get_by_id(str(ctx.author.id)):
-        trainer_repository.add(ctx.author.name, str(ctx.author.id))
-        logger.info("Trainer added")
+        try:
+            trainer_repository.add(ctx.author.name, str(ctx.author.id))
+            logger.info("Trainer added")
+        except Exception as e:
+            logger.error(f"Failed to add trainer: {e}")
     await ctx.send(message, embed=embed)
 
 

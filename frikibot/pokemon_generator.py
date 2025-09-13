@@ -13,10 +13,10 @@ from typing import Any
 import discord
 import requests
 from discord.ext import commands
-from infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 
 from frikibot.domain.pokemon import Pokemon
 from frikibot.domain.variety_data import VarietyData
+from frikibot.infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 from frikibot.shared.constants import MAX_INDEX, TIMEOUT
 
 pokemon_repository = SQLite3PokemonRepository()

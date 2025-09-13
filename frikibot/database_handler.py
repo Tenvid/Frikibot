@@ -38,63 +38,6 @@ class NonExistingElementError(Exception):
     """Raise when an element is missing."""
 
 
-def create_pokemon(poke: Pokemon) -> None:
-    """
-    Insert a Pokémon in database.
-
-    Args:
-    ----
-        poke (Pokemon): Generated Pokémon
-
-    Raises:
-    ------
-        NonExistingElementException: Raise when POKEMON_TABLE not in .env
-
-    """
-    if not POKEMON_TABLE:
-        raise NonExistingElementError
-
-    logger.debug(poke.name)
-    logger.debug(poke.first_type)
-    logger.debug(poke.second_type)
-    logger.debug(poke.author_code)
-    logger.debug(poke.moves_list)
-    for move in poke.moves_list:
-        logger.debug("Move: %s, type: %s", move, type(move))
-    logger.debug(poke.nature_name)
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            f"""
-INSERT INTO {POKEMON_TABLE} (
-                        Name,
-                        Tipo1,
-                        Tipo2,
-                        Entrenador,
-                        Move1,
-                        Move2,
-                        Move3,
-                        Move4,
-                        Naturaleza
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """,  # noqa: S608
-            (
-                poke.name,
-                poke.first_type,
-                poke.second_type,
-                poke.author_code,
-                poke.moves_list[0],
-                poke.moves_list[1],
-                poke.moves_list[2],
-                poke.moves_list[3],
-                poke.nature_name,
-            ),
-        )
-        conn.commit()
-        logger.info("Pokemon inserted")
-
-
 def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
     """
     Get all Pokémon owned by a trainer.

@@ -13,11 +13,13 @@ from typing import Any
 import discord
 import requests
 from discord.ext import commands
+from infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 
-from frikibot.database_handler import create_pokemon
 from frikibot.domain.pokemon import Pokemon
 from frikibot.domain.variety_data import VarietyData
 from frikibot.shared.constants import MAX_INDEX, TIMEOUT
+
+pokemon_repository = SQLite3PokemonRepository()
 
 
 class RequestTypes(enum.StrEnum):
@@ -268,7 +270,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         pokemon_entity.sprite,
     )
 
-    create_pokemon(pokemon_entity)
+    pokemon_repository.add(pokemon_entity)
     logger.info("Pokemon added to database")
     return embed
 

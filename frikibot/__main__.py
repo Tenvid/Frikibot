@@ -16,7 +16,6 @@ from frikibot import pokemon_generator
 from frikibot.database_handler import (
     create_database,
     read_pokemon_by_trainer,
-    read_trainer,
 )
 from frikibot.domain.paginated_view import PaginatedView
 from frikibot.infrastructure.sqlite3_trainer_repository import SQLite3TrainerRepository
@@ -57,7 +56,7 @@ async def pokemon(
 
     """
     embed, message = pokemon_generator.generate_random_pokemon(ctx)
-    if not read_trainer(str(ctx.author.id)):
+    if not trainer_repository.get_by_id(str(ctx.author.id)):
         trainer_repository.add(ctx.author.name, str(ctx.author.id))
         logger.info("Trainer added")
     await ctx.send(message, embed=embed)

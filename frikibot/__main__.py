@@ -11,11 +11,11 @@ import typing
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 
 from frikibot import pokemon_generator
 from frikibot.database_handler import create_database
 from frikibot.domain.paginated_view import PaginatedView
+from frikibot.infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 from frikibot.infrastructure.sqlite3_trainer_repository import SQLite3TrainerRepository
 
 load_dotenv()

@@ -3,9 +3,8 @@
 import sqlite3
 from typing import Any
 
-from shared.constants import DATABASE, TRAINER_TABLE
-
 from frikibot.domain.trainer_repository import TrainerRepository
+from frikibot.shared.constants import DATABASE, TRAINER_TABLE
 from frikibot.shared.exceptions import NonExistingElementError
 
 

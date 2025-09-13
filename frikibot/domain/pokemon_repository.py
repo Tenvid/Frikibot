@@ -22,3 +22,22 @@ class PokemonRepository(ABC):
             NonExistingElementException: Raise when POKEMON_TABLE not in .env
 
         """
+
+    @abstractmethod
+    def get_by_trainer_id(self, trainer_code: str) -> list[Pokemon]:
+        """
+        Get all Pokémon owned by a trainer.
+
+        Args:
+        ----
+            trainer_code (str): Trainer ID.
+
+        Returns:
+        -------
+            list[Pokemon]: List of Pokémon owned by the trainer.
+
+        Raises:
+        ------
+            NonExistingElementException: Raise when POKEMON_TABLE not in .env
+
+        """

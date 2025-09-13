@@ -85,3 +85,45 @@ class SQLite3PokemonRepository(PokemonRepository):
             )
             conn.commit()
             logger.info("Pokemon inserted")
+
+    def get_by_trainer_id(self, trainer_code: str) -> list[Pokemon]:
+        """
+        Get all Pokémon owned by a trainer.
+
+        Args:
+        ----
+            trainer_code (str): ID of the trainer.
+
+        Raises:
+        ------
+            NonExistingElementError: Raise when there is no database configured.
+
+        Returns:
+        -------
+            list[Pokemon]: List of Pokémon instances.
+
+        """
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute(
+                    """
+                SELECT ID,
+                    Name,
+                    Tipo1,
+                    Tipo2,
+                    Entrenador,
+                    Move1,
+                    Move2,
+                    Move3,
+                    Move4,
+                    Naturaleza
+                FROM pokemon
+                WHERE Entrenador = ?;
+                """,
+                    (trainer_code,),
+                )
+                return cursor.fetchall()
+
+            except sqlite3.Error as e:
+                raise e

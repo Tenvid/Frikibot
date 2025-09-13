@@ -11,12 +11,10 @@ import typing
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from infrastructure.sqlite3_pokemon_repository import SQLite3PokemonRepository
 
 from frikibot import pokemon_generator
-from frikibot.database_handler import (
-    create_database,
-    read_pokemon_by_trainer,
-)
+from frikibot.database_handler import create_database
 from frikibot.domain.paginated_view import PaginatedView
 from frikibot.infrastructure.sqlite3_trainer_repository import SQLite3TrainerRepository
 
@@ -33,6 +31,7 @@ logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
 logger = logging.getLogger("main")
 
 trainer_repository = SQLite3TrainerRepository()
+pokemon_repository = SQLite3PokemonRepository()
 
 
 # Event realised when the bot is connected
@@ -76,7 +75,7 @@ async def dex(ctx: commands.Context[typing.Any]) -> None:
 
     """
     view = PaginatedView()
-    view.data = read_pokemon_by_trainer(str(ctx.author.id))
+    view.data = pokemon_repository.get_by_trainer_id(str(ctx.author.id))
     view.user = ctx.author.name
     await view.send(ctx)
 

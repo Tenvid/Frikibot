@@ -7,8 +7,8 @@ from pathlib import Path
 
 from domain.pokemon import Pokemon
 
-from frikibot.database_handler import NonExistingElementError
 from frikibot.domain.pokemon_repository import PokemonRepository
+from frikibot.shared.exceptions import NonExistingElementError
 
 POKEMON_TABLE = os.getenv("POKEMON_TABLE")
 
@@ -93,10 +93,6 @@ class SQLite3PokemonRepository(PokemonRepository):
         Args:
         ----
             trainer_code (str): ID of the trainer.
-
-        Raises:
-        ------
-            NonExistingElementError: Raise when there is no database configured.
 
         Returns:
         -------

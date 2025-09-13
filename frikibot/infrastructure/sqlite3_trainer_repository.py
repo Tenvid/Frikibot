@@ -5,8 +5,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from frikibot.database_handler import NonExistingElementError
 from frikibot.domain.trainer_repository import TrainerRepository
+from frikibot.shared.exceptions import NonExistingElementError
 
 TRAINER_TABLE = os.getenv("TRAINER_TABLE")
 DATABASE_FOLDER: Path = Path(

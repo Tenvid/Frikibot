@@ -32,19 +32,8 @@ if not DATABASE_FOLDER.exists():
     DATABASE_FOLDER.mkdir()
 
 
-class NonExistingElementError(Exception):
-    """Raise when an element is missing."""
-
-
 def create_database():
-    """
-    Create tables for the database.
-
-    Raises
-    ------
-        NonExistingElementError: Rise if there is no DATABASE in .env
-
-    """
+    """Create tables for the database."""
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         try:

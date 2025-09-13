@@ -99,7 +99,7 @@ class SQLite3PokemonRepository(PokemonRepository):
                     Move3,
                     Move4,
                     Naturaleza
-                FROM pokemon
+                FROM {POKEMON_TABLE}
                 WHERE Entrenador = ?;
                 """,
                     (trainer_code,),

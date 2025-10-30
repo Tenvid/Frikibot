@@ -14,6 +14,7 @@ import discord
 import requests
 from discord.ext import commands
 
+from frikibot.controller.pokeapi_controller import PokeAPIController
 from frikibot.database_handler import create_pokemon
 from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
 from frikibot.global_variables import MAX_INDEX, TIMEOUT
@@ -39,6 +40,7 @@ logging.basicConfig(level="INFO", format="%(name)s - (%(levelname)s) -  [%(linen
 logger = logging.getLogger(name="PkGenerator")
 
 embed_builder = DiscordEmbedBuilder()
+pokeapi_controller = PokeAPIController()
 
 
 def _get_natures_list() -> list[dict[str, str]] | None:
@@ -189,13 +191,7 @@ def get_varieties(pokemon_index: int) -> list[Any] | None:
             requests.Timeout: When connection exceeds timeout
 
         """
-        response = try_make_http_get(
-                f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}",
-                RequestTypes.VARIETIES,
-        )
-        if response is not None:
-                return response.json()["varieties"]
-        return None
+        return pokeapi_controller.fetch_pokemon_varieties(pokemon_index)
 
 
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:

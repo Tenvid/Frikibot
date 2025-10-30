@@ -1,8 +1,10 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 import requests
 
 from frikibot import pokemon_generator
+from frikibot.exceptions import VarietyFetchError
 from frikibot.pokemon import Pokemon
 from frikibot.stats import Stats
 
@@ -183,27 +185,26 @@ def test_get_message_shiny():
 
 
 @patch("requests.get")
-def test_get_varieties_request_code_is_not_200(mock_get: MagicMock, caplog):
+def test_get_varieties_request_code_is_not_200(mock_get: MagicMock):
         mock_get.return_value.status_code = 404
 
-        assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
-
-        assert "Status code not valid 404" in caplog.text
-        assert "Type: VARIETIES" in caplog.text
+        with pytest.raises(VarietyFetchError):
+                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
 
 
 @patch("requests.get")
-def test_get_varieties_when_connection_error(mock_get: MagicMock, caplog):
+def test_get_varieties_when_connection_error(mock_get: MagicMock):
         mock_get.side_effect = requests.ConnectionError
 
-        assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
-        assert "Type: VARIETIES" in caplog.text
+        with pytest.raises(VarietyFetchError):
+                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
 
 
 @patch("requests.get")
 def test_get_varieties_when_timeout_error(mock_get: MagicMock):
         mock_get.side_effect = requests.Timeout
-        assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
+        with pytest.raises(VarietyFetchError):
+                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
 
 
 def test_pokemon_creation_if_error_obtaining_nature():

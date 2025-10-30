@@ -173,7 +173,7 @@ def get_message(color: str, ctx: commands.Context[Any]) -> str:
         return message
 
 
-def get_varieties(pokemon_index: int) -> list[Any] | None:
+def get_varieties(pokemon_index: int):
         """
         Request varietites of a Pokémon.
 
@@ -211,19 +211,10 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
         varieties = get_varieties(pokemon_index)
-        if varieties is None:
-                return discord.Embed(title="Error generating Pokémon data")
 
         variety = varieties[randbelow(len(varieties))]
 
-        detailed_variety = requests.get(variety["pokemon"]["url"], timeout=TIMEOUT).json()
-
-        detailed_variety = try_make_http_get(variety["pokemon"]["url"], RequestTypes.DETAILED_VARIETY)
-
-        if detailed_variety is None:
-                return discord.Embed(title="Error generating Pokémon data")
-
-        detailed_variety = detailed_variety.json()
+        detailed_variety = pokeapi_controller.fetch_variety_details(variety)
 
         data = VarietyData(
                 available_abilities=detailed_variety["abilities"],

@@ -2,7 +2,8 @@
 
 import requests
 
-from frikibot.exceptions import VarietyFetchError
+from frikibot.entities.variety import Variety
+from frikibot.exceptions import VarietyDetailsFetchError, VarietyFetchError
 from frikibot.global_variables import TIMEOUT
 
 
@@ -12,15 +13,27 @@ class PokeAPIController:
         def __init__(self):
                 """Initialize the PokeAPIController."""
 
-        def fetch_pokemon_varieties(self, pokemon_index: int) -> list:
+        def fetch_pokemon_varieties(self, pokemon_index: int) -> list[Variety]:
                 """Get all varieties of a Pokémon given its index."""
                 try:
                         raw_response = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_index}", timeout=TIMEOUT)
                         if raw_response.status_code == 200:
                                 json_response = raw_response.json()
-                                return json_response["varieties"]
+                                return [Variety.from_json(v) for v in json_response["varieties"]]
                 except requests.ConnectionError as exc:
                         raise VarietyFetchError(f"Connection error happened when trying to fetch pokémon: {pokemon_index}") from exc
                 except requests.Timeout as exc:
                         raise VarietyFetchError(f"Timeout error happened when trying to fetch pokémon: {pokemon_index}") from exc
                 raise VarietyFetchError(f"Failed fetching with index {pokemon_index}. Response status code: {raw_response.status_code}")
+
+        def fetch_variety_details(self, variety: Variety) -> object:
+                """Get details of a variety."""
+                try:
+                        raw_response = requests.get(variety.url, timeout=TIMEOUT)
+                        if raw_response.status_code == 200:
+                                return raw_response.json()
+                except requests.ConnectionError as exc:
+                        raise VarietyDetailsFetchError(f"Connection error happened trying to get details of variety: {variety}") from exc
+                except requests.Timeout as exc:
+                        raise VarietyDetailsFetchError(f"Timeout error happened trying to get details of variety: {variety}") from exc
+                raise VarietyFetchError(f"Failed fetching variety details from variety: {variety} . Response status code: {raw_response.status_code}")

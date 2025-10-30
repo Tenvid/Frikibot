@@ -82,9 +82,7 @@ class DiscordController:
                         """
                         if isinstance(error, commands.CommandOnCooldown):
                                 await ctx.send(
-                                        f" {ctx.author.mention} This command is actually"
-                                        f" on cooldown, wait"
-                                        f" {round(error.retry_after, 2)} seconds.",
+                                        f" {ctx.author.mention} This command is actually on cooldown, wait {round(error.retry_after, 2)} seconds.",
                                 )
 
         def start(self, token):

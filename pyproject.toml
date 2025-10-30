@@ -35,8 +35,8 @@ build-backend = "poetry.core.masonry.api"
 poetry-plugin-export = ">=1.8"
 
 [tool.ruff]
-line-length = 90
-indent-width = 4
+line-length = 160
+indent-width = 8
 # exclude = ["tests"]
 target-version = "py311"
 

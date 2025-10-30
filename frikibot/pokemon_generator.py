@@ -173,27 +173,6 @@ def get_message(color: str, ctx: commands.Context[Any]) -> str:
         return message
 
 
-def get_varieties(pokemon_index: int):
-        """
-        Request varietites of a Pokémon.
-
-        Args:
-        ----
-            pokemon_index: Pokédex number of the Pokémon
-
-        Returns:
-        -------
-            list[Any] | None: List of varieties
-
-        Raises:
-        ------
-            requests.ConnectionError: When status_code is not 200 or an error
-            requests.Timeout: When connection exceeds timeout
-
-        """
-        return pokeapi_controller.fetch_pokemon_varieties(pokemon_index)
-
-
 def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         """
         Create embed message to display all data.
@@ -210,11 +189,9 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
         """
         pokemon_index = randbelow(MAX_INDEX - 1) + 1
 
-        varieties = get_varieties(pokemon_index)
+        varieties = pokeapi_controller.fetch_pokemon_varieties(pokemon_index)
 
-        variety = varieties[randbelow(len(varieties))]
-
-        detailed_variety = pokeapi_controller.fetch_variety_details(variety)
+        detailed_variety = pokeapi_controller.fetch_variety_details(randbelow(len(varieties)))
 
         data = VarietyData(
                 available_abilities=detailed_variety["abilities"],

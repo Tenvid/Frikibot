@@ -5,13 +5,13 @@ import typing
 
 from discord.ext import commands
 
-from frikibot import pokemon_generator
 from frikibot.database_handler import (
         create_trainer,
         read_pokemon_by_trainer,
         read_trainer,
 )
 from frikibot.paginated_view import PaginatedView
+from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class DiscordController:
                                 ctx (commands.Context): Command context
 
                         """
-                        embed, message = pokemon_generator.generate_random_pokemon(ctx)
+                        embed, message = GeneratePokemonUseCase(ctx).execute()
                         if not read_trainer(str(ctx.author.id)):
                                 logger.info("Trainer added")
                                 create_trainer(ctx.author.name, str(ctx.author.id))

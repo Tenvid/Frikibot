@@ -15,6 +15,7 @@ import requests
 from discord.ext import commands
 
 from frikibot.database_handler import create_pokemon
+from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
 from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
 from frikibot.variety_data import VarietyData
@@ -36,6 +37,8 @@ class RequestTypes(enum.StrEnum):
 
 logging.basicConfig(level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s")
 logger = logging.getLogger(name="PkGenerator")
+
+embed_builder = DiscordEmbedBuilder()
 
 
 def _get_natures_list() -> list[dict[str, str]] | None:
@@ -277,13 +280,12 @@ def _generate_embed(
         sprite,
 ):
         embed = (
-                discord.Embed(
-                        title=f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}* {pokemon_name.capitalize()}",
-                        description=f"Ability: {ability.replace('-', ' ').capitalize()}",
-                )
-                .set_image(url=sprite)
-                .add_field(name="Moves", value=moves_string)
-                .add_field(name="Stats", value=stats_string)
+                embed_builder.with_title(f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}* {pokemon_name.capitalize()}")
+                .with_description(f"Ability: {ability.replace('-', ' ').capitalize()}")
+                .with_image(sprite)
+                .with_field(name="Moves", value=moves_string)
+                .with_field(name="Stats", value=stats_string)
+                .build()
         )
 
         if sprite is None:

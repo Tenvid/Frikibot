@@ -207,40 +207,26 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
         logger.info("Pokemon created")
 
-        embed = _generate_embed(
-                pokemon_entity.pokedex_number,
-                pokemon_entity.name,
-                pokemon_entity.nature,
-                get_moves_string(pokemon_entity.moves_list),
-                str(pokemon_entity.stats),
-                pokemon_entity.ability,
-                pokemon_entity.sprite,
-        )
+        embed = _generate_embed(pokemon_entity)
 
         create_pokemon(pokemon_entity)
         logger.info("Pokemon added to database")
         return embed
 
 
-def _generate_embed(
-        pokemon_index,
-        pokemon_name,
-        nature,
-        moves_string,
-        stats_string,
-        ability,
-        sprite,
-):
+def _generate_embed(pokemon: Pokemon):
         embed = (
-                embed_builder.with_title(f"# {pokemon_index} *{nature['name'].capitalize() if nature else 'Hardy'}* {pokemon_name.capitalize()}")
-                .with_description(f"Ability: {ability.replace('-', ' ').capitalize()}")
-                .with_image(sprite)
-                .with_field(name="Moves", value=moves_string)
-                .with_field(name="Stats", value=stats_string)
+                embed_builder.with_title(
+                        f"# {pokemon.pokedex_number} *{pokemon.nature['name'].capitalize() if pokemon.nature else 'Hardy'}* {pokemon.name.capitalize()}"
+                )
+                .with_description(f"Ability: {pokemon.ability.replace('-', ' ').capitalize()}")
+                .with_image(pokemon.sprite)
+                .with_field(name="Moves", value=get_moves_string(pokemon.moves_list))
+                .with_field(name="Stats", value=str(pokemon.stats))
                 .build()
         )
 
-        if sprite is None:
+        if pokemon.sprite is None:
                 embed.add_field(
                         name="Unexpected Sprite",
                         inline=False,

@@ -3,6 +3,7 @@
 import requests
 
 from frikibot.entities.variety import Variety
+from frikibot.entities.variety_details import VarietyDetails
 from frikibot.exceptions import VarietyDetailsFetchError, VarietyFetchError
 from frikibot.global_variables import TIMEOUT
 
@@ -26,12 +27,13 @@ class PokeAPIController:
                         raise VarietyFetchError(f"Timeout error happened when trying to fetch pokémon: {pokemon_index}") from exc
                 raise VarietyFetchError(f"Failed fetching with index {pokemon_index}. Response status code: {raw_response.status_code}")
 
-        def fetch_variety_details(self, variety: Variety) -> object:
+        def fetch_variety_details(self, variety: Variety) -> VarietyDetails:
                 """Get details of a variety."""
                 try:
                         raw_response = requests.get(variety.url, timeout=TIMEOUT)
                         if raw_response.status_code == 200:
-                                return raw_response.json()
+                                json_response = raw_response.json()
+                                return VarietyDetails.from_json(json_response)
                 except requests.ConnectionError as exc:
                         raise VarietyDetailsFetchError(f"Connection error happened trying to get details of variety: {variety}") from exc
                 except requests.Timeout as exc:

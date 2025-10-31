@@ -23,17 +23,76 @@ def mock_variety():
         return variety
 
 
+@pytest.fixture()
+def mock_detailed_variety_response():
+        return {
+                "is_default": True,
+                "name": "riolu",
+                "species": {"url": "https://pokeapi.co/api/v2/pokemon-species/447/"},
+                "abilities": [
+                        {"ability": {"name": "steadfast", "url": "https://pokeapi.co/api/v2/ability/80/"}, "is_hidden": False, "slot": 1},
+                        {"ability": {"name": "inner-focus", "url": "https://pokeapi.co/api/v2/ability/39/"}, "is_hidden": False, "slot": 2},
+                        {"ability": {"name": "prankster", "url": "https://pokeapi.co/api/v2/ability/158/"}, "is_hidden": True, "slot": 3},
+                ],
+                "moves": [{"move": {"name": "pound", "url": "https://pokeapi.co/api/v2/move/1/"}, "version_group_details": []}],
+                "stats": [
+                        {"base_stat": 40, "effort": 0, "stat": {"name": "hp", "url": "https://pokeapi.co/api/v2/stat/1/"}},
+                        {"base_stat": 70, "effort": 0, "stat": {"name": "attack", "url": "https://pokeapi.co/api/v2/stat/2/"}},
+                        {"base_stat": 40, "effort": 0, "stat": {"name": "defense", "url": "https://pokeapi.co/api/v2/stat/3/"}},
+                        {"base_stat": 35, "effort": 0, "stat": {"name": "special-attack", "url": "https://pokeapi.co/api/v2/stat/4/"}},
+                        {"base_stat": 40, "effort": 0, "stat": {"name": "special-defense", "url": "https://pokeapi.co/api/v2/stat/5/"}},
+                        {"base_stat": 60, "effort": 1, "stat": {"name": "speed", "url": "https://pokeapi.co/api/v2/stat/6/"}},
+                ],
+                "types": [{"slot": 1, "type": {"name": "fighting", "url": "https://pokeapi.co/api/v2/type/2/"}}],
+                "sprites": {
+                        "back_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/447.png",
+                        "back_female": None,
+                        "back_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/447.png",
+                        "back_shiny_female": None,
+                        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/447.png",
+                        "front_female": None,
+                        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/447.png",
+                        "front_shiny_female": None,
+                        "other": {
+                                "dream_world": {
+                                        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/447.svg",
+                                        "front_female": None,
+                                },
+                                "home": {
+                                        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/447.png",
+                                        "front_female": None,
+                                        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/447.png",
+                                        "front_shiny_female": None,
+                                },
+                                "official-artwork": {
+                                        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/447.png",
+                                        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/447.png",
+                                },
+                        },
+                        "versions": {},
+                },
+        }
+
+
 @patch("requests.get")
-def test_fetch_variety_details_success(mock_get, controller, mock_variety):
+def test_fetch_variety_details_success(mock_get, controller, mock_variety, mock_detailed_variety_response):
         """Test successful fetch of variety details."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {"name": "bulbasaur", "id": 1}
+        mock_response.json.return_value = mock_detailed_variety_response
         mock_get.return_value = mock_response
 
-        result = controller.fetch_variety_details(mock_variety)
+        variety_details = controller.fetch_variety_details(mock_variety)
 
-        assert result == {"name": "bulbasaur", "id": 1}
+        mock_get.assert_called_once_with(mock_variety.url, timeout=10)
+        assert variety_details.is_default == mock_detailed_variety_response["is_default"]
+        assert variety_details.name == mock_detailed_variety_response["name"]
+        assert variety_details.url == mock_detailed_variety_response["species"]["url"]
+        assert variety_details.available_abilities == mock_detailed_variety_response["abilities"]
+        assert variety_details.available_moves == mock_detailed_variety_response["moves"]
+        assert variety_details.combat_stats == mock_detailed_variety_response["stats"]
+        assert variety_details.types == mock_detailed_variety_response["types"]
+        assert variety_details.available_sprites == mock_detailed_variety_response["sprites"]
 
 
 @patch("requests.get")

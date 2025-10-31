@@ -19,7 +19,6 @@ from frikibot.database_handler import create_pokemon
 from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
 from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
-from frikibot.variety_data import VarietyData
 
 
 class RequestTypes(enum.StrEnum):
@@ -188,33 +187,22 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
         """
         pokemon_index = randbelow(MAX_INDEX - 1) + 1
-
         varieties = pokeapi_controller.fetch_pokemon_varieties(pokemon_index)
-
-        detailed_variety = pokeapi_controller.fetch_variety_details(randbelow(len(varieties)))
-
-        data = VarietyData(
-                available_abilities=detailed_variety["abilities"],
-                available_moves=detailed_variety["moves"],
-                combat_stats=detailed_variety["stats"],
-                name=detailed_variety["name"],
-                available_sprites=detailed_variety["sprites"],
-                types=detailed_variety["types"],
-        )
+        detailed_variety = pokeapi_controller.fetch_variety_details(varieties[randbelow(len(varieties))])
 
         logger.info("VarietyData created")
 
         pokemon_entity = Pokemon(
-                name=data.name,
+                name=detailed_variety.name,
                 list_index=pokemon_index,
                 author_code=str(ctx.author.id),
                 nature=_fetch_random_nature(),
-                first_type=data.types[0]["type"]["name"],
-                second_type=data.types[1]["type"]["name"] if len(data.types) > 1 else "none",
-                available_moves=data.available_moves,
-                available_abilities=data.available_abilities,
-                stats_data=data.combat_stats,
-                sprite=data.get_official_artwork_sprite(color),
+                first_type=detailed_variety.types[0]["type"]["name"],
+                second_type=detailed_variety.types[1]["type"]["name"] if len(detailed_variety.types) > 1 else "none",
+                available_moves=detailed_variety.available_moves,
+                available_abilities=detailed_variety.available_abilities,
+                stats_data=detailed_variety.combat_stats,
+                sprite=detailed_variety.get_official_artwork_sprite(color),
         )
 
         logger.info("Pokemon created")

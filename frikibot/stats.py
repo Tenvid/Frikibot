@@ -25,13 +25,6 @@ class Stats:
                 data: list[dict] | None,
                 decreased: dict | None = None,
                 increased: dict | None = None,
-                *,
-                hp: int | None = None,
-                attack: int | None = None,
-                defense: int | None = None,
-                special_attack: int | None = None,
-                special_defense: int | None = None,
-                speed: int | None = None,
         ):
                 """
                 Pokémon stats constructor.
@@ -57,13 +50,6 @@ class Stats:
                         self.special_attack = data[3]["base_stat"]
                         self.special_defense = data[4]["base_stat"]
                         self.speed = data[5]["base_stat"]
-                else:
-                        self.hp = hp
-                        self.attack = attack
-                        self.defense = defense
-                        self.special_attack = special_attack
-                        self.special_defense = special_defense
-                        self.speed = speed
                 self.decreased = decreased
                 self.increased = increased
 

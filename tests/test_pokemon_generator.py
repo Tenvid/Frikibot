@@ -34,22 +34,28 @@ class PokemonBuilder:
                         {"move": {"name": "D"}},
                 ]
 
-                self.stats_data = [
-                        {"base_stat": 0},
-                        {"base_stat": 0},
-                        {"base_stat": 0},
-                        {"base_stat": 0},
-                        {"base_stat": 0},
-                        {"base_stat": 0},
-                ]
+                self.stats = Stats(
+                        [
+                                {"base_stat": 0},
+                                {"base_stat": 0},
+                                {"base_stat": 0},
+                                {"base_stat": 0},
+                                {"base_stat": 0},
+                                {"base_stat": 0},
+                        ],
+                        None,
+                        None,
+                )
                 self.sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png"
 
-        def with_stats(self, stats: list[dict[str, int]]) -> "PokemonBuilder":
-                self.stats_data = stats
+        def with_stats(self, stats: Stats) -> "PokemonBuilder":
+                self.stats = stats
                 return self
 
         def with_nature(self, nature: Nature) -> "PokemonBuilder":
                 self.nature = nature
+                self.stats.decreased = nature.decreased
+                self.stats.increased = nature.increased
                 return self
 
         def build(self) -> Pokemon:
@@ -62,7 +68,7 @@ class PokemonBuilder:
                         available_moves=self.available_moves,
                         list_index=self.list_index,
                         nature=self.nature,
-                        stats_data=self.stats_data,
+                        stats=self.stats,
                         sprite=self.sprite,
                 )
 
@@ -138,14 +144,16 @@ def test_get_pokemon_stats():
         fake_pokemon = (
                 PokemonBuilder()
                 .with_stats(
-                        [
-                                {"base_stat": 70},
-                                {"base_stat": 110},
-                                {"base_stat": 70},
-                                {"base_stat": 115},
-                                {"base_stat": 70},
-                                {"base_stat": 90},
-                        ]
+                        Stats(
+                                [
+                                        {"base_stat": 70},
+                                        {"base_stat": 110},
+                                        {"base_stat": 70},
+                                        {"base_stat": 115},
+                                        {"base_stat": 70},
+                                        {"base_stat": 90},
+                                ]
+                        )
                 )
                 .build()
         )

@@ -27,7 +27,7 @@ class Pokemon:
                 author_code: str,
                 available_abilities: list[dict],
                 available_moves: list[dict],
-                stats_data: list[dict],
+                stats: Stats,
                 sprite: str | None,
         ):
                 """
@@ -37,15 +37,14 @@ class Pokemon:
                 ----
                     name (str): Pokémon name
                     list_index (int): Pokémon number in list
-                    moves_list (list): List of movements
-                    nature (str): Pokémon nature
+                    nature (Nature): Pokémon nature
                     first_type (str): Primary type
-                    second_type (str): Secondary type if there is
+                    second_type (str | None): Secondary type if there is
                     author_code (str): Trainer id
-                    available_moves: (list[dict]): Dict with moves info
-                    stats_data: (list[dict]): List of Pokémon stats
-                    available_abilities: (list[dict]): List of Pokémon available abilities
-                    sprite (str|None): Url of the sprite
+                    available_abilities (list[dict]): List of Pokémon available abilities
+                    available_moves (list[dict]): List of available moves
+                    stats (Stats): Pokémon stats
+                    sprite (str | None): Url of the sprite
 
                 """
                 logger.debug("Pokemon initalization started.")
@@ -75,16 +74,8 @@ class Pokemon:
                 self.ability = self._get_random_ability(available_abilities)
                 logger.debug("Pokemon ability set")
                 self.sprite = sprite
-                try:
-                        self.stats = Stats(
-                                stats_data,
-                                self.nature.decreased,
-                                self.nature.increased,
-                        )
-                        logger.debug("Pokemon stats set")
-                except KeyError:
-                        self.stats = Stats(stats_data, None, None)
-                        logger.warning("Modified stats could not be obtained from nature, defaulting to None.")
+
+                self.stats = stats
 
         def _get_pokemon_moves(self, available_moves: list[dict]) -> list[str]:
                 """

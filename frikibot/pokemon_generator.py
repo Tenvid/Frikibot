@@ -19,6 +19,7 @@ from frikibot.database_handler import create_pokemon
 from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
 from frikibot.global_variables import MAX_INDEX, TIMEOUT
 from frikibot.pokemon import Pokemon
+from frikibot.stats import Stats
 
 
 class RequestTypes(enum.StrEnum):
@@ -172,6 +173,8 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
         logger.info("Nature created: %s", nature)
 
+        pokemon_stats = Stats(detailed_variety.combat_stats, nature.decreased, nature.increased)
+
         pokemon_entity = Pokemon(
                 name=detailed_variety.name,
                 list_index=pokemon_index,
@@ -181,7 +184,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
                 second_type=detailed_variety.types[1]["type"]["name"] if len(detailed_variety.types) > 1 else "none",
                 available_moves=detailed_variety.available_moves,
                 available_abilities=detailed_variety.available_abilities,
-                stats_data=detailed_variety.combat_stats,
+                stats=pokemon_stats,
                 sprite=detailed_variety.get_official_artwork_sprite(color),
         )
 

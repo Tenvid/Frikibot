@@ -1,6 +1,7 @@
 """Controller to route Discord commands."""
 
 import logging
+import random
 import typing
 
 from discord.ext import commands
@@ -11,6 +12,8 @@ from frikibot.database_handler import (
         read_trainer,
 )
 from frikibot.paginated_view import PaginatedView
+from frikibot.usecases.generate_embed_usecase import GenerateEmbedUseCase
+from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase
 
 logger = logging.getLogger(__name__)
@@ -41,7 +44,15 @@ class DiscordController:
                                 ctx (commands.Context): Command context
 
                         """
-                        embed, message = GeneratePokemonUseCase(ctx).execute()
+                        color = "shiny" if random.randint(0, 101) <= 10 else "default"  # noqa: S311
+
+                        pokemon = GeneratePokemonUseCase(ctx, color).execute()
+                        logger.info("Pokemon generated")
+                        embed = GenerateEmbedUseCase(pokemon).execute()
+                        logger.info("Embed generated")
+                        message = GenerateMessageUseCase(ctx, color).execute()
+                        logger.info("Message created")
+
                         if not read_trainer(str(ctx.author.id)):
                                 logger.info("Trainer added")
                                 create_trainer(ctx.author.name, str(ctx.author.id))

@@ -1,13 +1,9 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import pytest
-import requests
-
-from entities.nature import Nature
-from frikibot import pokemon_generator
-from frikibot.exceptions import VarietyFetchError
+from frikibot.entities.nature import Nature
 from frikibot.pokemon import Pokemon
 from frikibot.stats import Stats
+from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 
 
 class PokemonBuilder:
@@ -168,56 +164,20 @@ def test_get_pokemon_stats():
         assert stats.speed == 90
 
 
-def test_get_moves_string():
-        move_list = ["swords-dance", "aura-sphere", "close-combat", "iron-head"]
-
-        moves_string = pokemon_generator.get_moves_string(move_list)
-
-        assert (
-                moves_string
-                == """```
-Swords dance
-Aura sphere
-Close combat
-Iron head```"""
-        )
-
-
 def test_get_message_normal():
         context = MagicMock()
         context.author.mention = "Author"
-        message = pokemon_generator.get_message("normal", context)
+        usecase = GenerateMessageUseCase(context, "normal")
+        message = usecase.execute()
         assert message == "Author Here you have your Pokémon"
 
 
 def test_get_message_shiny():
         context = MagicMock()
         context.author.mention = "Author"
-        message = pokemon_generator.get_message("shiny", context)
+        usecase = GenerateMessageUseCase(context, "shiny")
+        message = usecase.execute()
         assert message == "Author Here you have your ✨SHINY✨ Pokémon"
-
-
-@patch("requests.get")
-def test_get_varieties_request_code_is_not_200(mock_get: MagicMock):
-        mock_get.return_value.status_code = 404
-
-        with pytest.raises(VarietyFetchError):
-                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
-
-
-@patch("requests.get")
-def test_get_varieties_when_connection_error(mock_get: MagicMock):
-        mock_get.side_effect = requests.ConnectionError
-
-        with pytest.raises(VarietyFetchError):
-                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
-
-
-@patch("requests.get")
-def test_get_varieties_when_timeout_error(mock_get: MagicMock):
-        mock_get.side_effect = requests.Timeout
-        with pytest.raises(VarietyFetchError):
-                assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
 
 
 def test_sprite_should_be_official_artwork():

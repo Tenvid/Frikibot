@@ -38,7 +38,6 @@ class RequestTypes(enum.StrEnum):
 logging.basicConfig(level="INFO", format="%(name)s - (%(levelname)s) -  [%(lineno)d] - %(message)s")
 logger = logging.getLogger(name="PkGenerator")
 
-embed_builder = DiscordEmbedBuilder()
 pokeapi_controller = PokeAPIController()
 
 NATURES = pokeapi_controller.fetch_all_natures()
@@ -207,9 +206,8 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
 def _generate_embed(pokemon: Pokemon):
         embed = (
-                embed_builder.with_title(
-                        f"# {pokemon.pokedex_number} *{pokemon.nature['name'].capitalize() if pokemon.nature else 'Hardy'}* {pokemon.name.capitalize()}"
-                )
+                DiscordEmbedBuilder()
+                .with_title(f"# {pokemon.pokedex_number} *{pokemon.nature['name'].capitalize() if pokemon.nature else 'Hardy'}* {pokemon.name.capitalize()}")
                 .with_description(f"Ability: {pokemon.ability.replace('-', ' ').capitalize()}")
                 .with_image(pokemon.sprite)
                 .with_field(name="Moves", value=get_moves_string(pokemon.moves_list))

@@ -41,13 +41,7 @@ logger = logging.getLogger(name="PkGenerator")
 embed_builder = DiscordEmbedBuilder()
 pokeapi_controller = PokeAPIController()
 
-
-def _get_natures_list() -> list[dict[str, str]] | None:
-        response = try_make_http_get("https://pokeapi.co/api/v2/nature?limit=25", RequestTypes.NATURES_LIST)
-
-        if response is not None:
-                return response.json()["results"]
-        return None
+NATURES = pokeapi_controller.fetch_all_natures()
 
 
 def _fetch_random_nature() -> dict:
@@ -95,9 +89,6 @@ def try_make_http_get(url: str, request_type: RequestTypes) -> requests.Response
                         request_type,
                 )
         return None
-
-
-NATURES = _get_natures_list()
 
 
 def get_moves_string(moves_list: list[str]) -> str:

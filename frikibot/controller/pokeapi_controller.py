@@ -4,7 +4,7 @@ import requests
 
 from frikibot.entities.variety import Variety
 from frikibot.entities.variety_details import VarietyDetails
-from frikibot.exceptions import VarietyDetailsFetchError, VarietyFetchError
+from frikibot.exceptions import NatureFetchError, VarietyDetailsFetchError, VarietyFetchError
 from frikibot.global_variables import TIMEOUT
 
 
@@ -39,3 +39,16 @@ class PokeAPIController:
                 except requests.Timeout as exc:
                         raise VarietyDetailsFetchError(f"Timeout error happened trying to get details of variety: {variety}") from exc
                 raise VarietyFetchError(f"Failed fetching variety details from variety: {variety} . Response status code: {raw_response.status_code}")
+
+        def fetch_all_natures(self):
+                """Get all available natures."""
+
+                def _get_natures_list() -> list[dict[str, str]] | None:
+                        try:
+                                response = requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT)
+                                if response.status_code == 200:
+                                        return response.json()["results"]
+                        except requests.ConnectionError as exc:
+                                raise NatureFetchError("Connection error tryinh to fetch all natures") from exc
+                        except requests.Timeout as exc:
+                                raise NatureFetchError("Timeout error happened tryinh to fetch all natures.") from exc

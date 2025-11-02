@@ -15,3 +15,11 @@ class VarietyDetailsFetchError(Exception):
         def __init__(self, *args):
                 """Init."""
                 super().__init__(*args)
+
+
+class NatureFetchError(Exception):
+        """Raises when failing trying to fetch nature data."""
+
+        def __init__(self, *args):
+                """Init."""
+                super().__init__(*args)

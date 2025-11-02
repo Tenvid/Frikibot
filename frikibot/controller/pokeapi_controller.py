@@ -1,7 +1,10 @@
 """Module for PokeAPIController class."""
 
+import random
+
 import requests
 
+from frikibot.entities.nature import Nature
 from frikibot.entities.variety import Variety
 from frikibot.entities.variety_details import VarietyDetails
 from frikibot.exceptions import NatureFetchError, VarietyDetailsFetchError, VarietyFetchError
@@ -40,15 +43,15 @@ class PokeAPIController:
                         raise VarietyDetailsFetchError(f"Timeout error happened trying to get details of variety: {variety}") from exc
                 raise VarietyFetchError(f"Failed fetching variety details from variety: {variety} . Response status code: {raw_response.status_code}")
 
-        def fetch_all_natures(self):
-                """Get all available natures."""
-
-                def _get_natures_list() -> list[dict[str, str]] | None:
-                        try:
-                                response = requests.get("https://pokeapi.co/api/v2/nature", timeout=TIMEOUT)
-                                if response.status_code == 200:
-                                        return response.json()["results"]
-                        except requests.ConnectionError as exc:
-                                raise NatureFetchError("Connection error tryinh to fetch all natures") from exc
-                        except requests.Timeout as exc:
-                                raise NatureFetchError("Timeout error happened tryinh to fetch all natures.") from exc
+        def fetch_random_nature(self) -> Nature:
+                """Get a random nature."""
+                nature_index = random.randint(0, 25 - 1)  # TODO: Max index should be retrieved from api  # noqa: S311
+                try:
+                        response = requests.get(f"https://pokeapi.co/api/v2/nature/{nature_index}", timeout=TIMEOUT)
+                        if response.status_code == 200:
+                                return Nature.from_json(response.json())
+                        raise requests.ConnectionError("Status code: %d", response.status_code)
+                except requests.ConnectionError as exc:
+                        raise NatureFetchError("Connection error trying to fetch a random nature") from exc
+                except requests.Timeout as exc:
+                        raise NatureFetchError("Timeout error happened trying to fetch a random nature.") from exc

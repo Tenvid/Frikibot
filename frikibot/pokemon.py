@@ -7,6 +7,7 @@ This module contains a class for Pokémon entities
 from logging import getLogger
 from secrets import randbelow
 
+from frikibot.entities.nature import Nature
 from frikibot.stats import Stats
 
 logger = getLogger("Pokemon")
@@ -20,7 +21,7 @@ class Pokemon:
                 *,
                 name: str,
                 list_index: int,
-                nature: dict,
+                nature: Nature,
                 first_type: str,
                 second_type: str | None,
                 author_code: str,
@@ -55,7 +56,7 @@ class Pokemon:
                 self.nature = nature
                 logger.debug("Pokemon nature set")
                 try:
-                        self.nature_name = nature["name"]
+                        self.nature_name = nature.name
                         logger.debug("Pokemon nature_name set")
                 except KeyError:
                         self.nature_name = "Unknown nature"
@@ -77,8 +78,8 @@ class Pokemon:
                 try:
                         self.stats = Stats(
                                 stats_data,
-                                self.nature["decreased_stat"],
-                                self.nature["increased_stat"],
+                                self.nature.decreased,
+                                self.nature.increased,
                         )
                         logger.debug("Pokemon stats set")
                 except KeyError:

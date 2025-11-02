@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
+from entities.nature import Nature
 from frikibot import pokemon_generator
 from frikibot.exceptions import VarietyFetchError
 from frikibot.pokemon import Pokemon
@@ -15,11 +16,13 @@ class PokemonBuilder:
         def __init__(self) -> None:
                 self.name = "Example"
                 self.list_index = -1
-                self.nature = {
-                        "name": "none",
-                        "decreased_stat": None,
-                        "increased_stat": None,
-                }
+                self.nature = Nature.from_json(
+                        {
+                                "name": "none",
+                                "decreased_stat": None,
+                                "increased_stat": None,
+                        }
+                )
                 self.first_type = "water"
                 self.second_type = None
                 self.author_code = "some_code"
@@ -45,7 +48,7 @@ class PokemonBuilder:
                 self.stats_data = stats
                 return self
 
-        def with_nature(self, nature: dict) -> "PokemonBuilder":
+        def with_nature(self, nature: Nature) -> "PokemonBuilder":
                 self.nature = nature
                 return self
 
@@ -70,11 +73,11 @@ def test_pokemon_instance_attributes_are_correct():
         assert pokemon.ability == "A"
         assert pokemon.name == "Example"
         assert pokemon.pokedex_number == -1
-        assert pokemon.nature == {
-                "decreased_stat": None,
-                "increased_stat": None,
-                "name": "none",
-        }
+
+        assert pokemon.nature.name == "none"
+        assert pokemon.nature.decreased is None
+        assert pokemon.nature.increased is None
+
         assert pokemon.nature_name == "none"
         assert pokemon.first_type == "water"
         assert pokemon.second_type is None
@@ -108,11 +111,13 @@ def test_get_stats_string_with_non_neutral_nature():
         fake_pokemon = (
                 PokemonBuilder()
                 .with_nature(
-                        {
-                                "name": "impish",
-                                "increased_stat": {"name": "defense"},
-                                "decreased_stat": {"name": "special-attack"},
-                        }
+                        Nature.from_json(
+                                {
+                                        "name": "impish",
+                                        "increased_stat": {"name": "defense"},
+                                        "decreased_stat": {"name": "special-attack"},
+                                }
+                        )
                 )
                 .build()
         )
@@ -205,14 +210,6 @@ def test_get_varieties_when_timeout_error(mock_get: MagicMock):
         mock_get.side_effect = requests.Timeout
         with pytest.raises(VarietyFetchError):
                 assert pokemon_generator.build_embed("normal", MagicMock()).title == "Error generating Pokémon data"
-
-
-def test_pokemon_creation_if_error_obtaining_nature():
-        pokemon = PokemonBuilder().with_nature({}).build()
-
-        assert pokemon.nature_name == "Unknown nature"
-        assert pokemon.stats.increased is None
-        assert pokemon.stats.decreased is None
 
 
 def test_sprite_should_be_official_artwork():

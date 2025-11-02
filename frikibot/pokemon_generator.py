@@ -40,21 +40,6 @@ logger = logging.getLogger(name="PkGenerator")
 
 pokeapi_controller = PokeAPIController()
 
-NATURES = pokeapi_controller.fetch_all_natures()
-
-
-def _fetch_random_nature() -> dict:
-        if NATURES is None:
-                return {}
-
-        nature_url = NATURES[randbelow(len(NATURES))]["url"]
-
-        response = try_make_http_get(nature_url, RequestTypes.RANDOM_NATURE)
-
-        if response is None:
-                return {}
-        return response.json()
-
 
 def try_make_http_get(url: str, request_type: RequestTypes) -> requests.Response | None:
         """
@@ -177,16 +162,21 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 
         """
         pokemon_index = randbelow(MAX_INDEX - 1) + 1
+
         varieties = pokeapi_controller.fetch_pokemon_varieties(pokemon_index)
         detailed_variety = pokeapi_controller.fetch_variety_details(varieties[randbelow(len(varieties))])
 
         logger.info("VarietyData created")
 
+        nature = pokeapi_controller.fetch_random_nature()
+
+        logger.info("Nature created: %s", nature)
+
         pokemon_entity = Pokemon(
                 name=detailed_variety.name,
                 list_index=pokemon_index,
                 author_code=str(ctx.author.id),
-                nature=_fetch_random_nature(),
+                nature=nature,
                 first_type=detailed_variety.types[0]["type"]["name"],
                 second_type=detailed_variety.types[1]["type"]["name"] if len(detailed_variety.types) > 1 else "none",
                 available_moves=detailed_variety.available_moves,
@@ -207,7 +197,7 @@ def build_embed(color: str, ctx: commands.Context[Any]) -> discord.Embed:
 def _generate_embed(pokemon: Pokemon):
         embed = (
                 DiscordEmbedBuilder()
-                .with_title(f"# {pokemon.pokedex_number} *{pokemon.nature['name'].capitalize() if pokemon.nature else 'Hardy'}* {pokemon.name.capitalize()}")
+                .with_title(f"# {pokemon.pokedex_number} *{pokemon.nature.name.capitalize() if pokemon.nature else 'Serious'}* {pokemon.name.capitalize()}")
                 .with_description(f"Ability: {pokemon.ability.replace('-', ' ').capitalize()}")
                 .with_image(pokemon.sprite)
                 .with_field(name="Moves", value=get_moves_string(pokemon.moves_list))

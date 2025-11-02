@@ -98,9 +98,9 @@ class Stats:
                 logger.debug("Red stat: %s", self.increased)
                 logger.debug("Stat tuple: %s", stat_tuple)
 
-                if self.decreased and stat_tuple[0] == self.decreased["name"]:
+                if self.decreased and stat_tuple[0] == self.decreased:
                         return f"\u001b[0;34m{stat_tuple[0].replace('-', ' ').capitalize()}: {math.floor(stat_tuple[1] * 0.9)}-\u001b[0;0m"
-                if self.increased and stat_tuple[0] == self.increased["name"]:
+                if self.increased and stat_tuple[0] == self.increased:
                         return f"\u001b[0;31m{stat_tuple[0].replace('-', ' ').capitalize()}:{math.floor(stat_tuple[1] * 1.1)}+\u001b[0;0m"
 
                 return f"{stat_tuple[0].replace('-', ' ').capitalize()}: {stat_tuple[1]}"

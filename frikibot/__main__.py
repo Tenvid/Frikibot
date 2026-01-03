@@ -17,11 +17,12 @@ from frikibot.database_handler import create_database
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
+if not TOKEN:
+        exit(1)
 
 bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 
 logging.basicConfig(level="INFO", format="%(name)s-%(levelname)s-%(message)s")
-
 
 if __name__ == "__main__":
         create_database()

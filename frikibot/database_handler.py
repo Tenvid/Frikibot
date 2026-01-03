@@ -194,7 +194,7 @@ def read_pokemon_by_trainer(trainer_code: str) -> list[Pokemon]:
                         raise e
 
 
-def create_database():
+def create_database() -> None:
         """
         Create tables for the database.
 

@@ -5,6 +5,7 @@ import typing
 from discord.ext import commands
 
 from frikibot import pokemon_generator
+from frikibot.pokemon import Pokemon
 
 
 class GeneratePokemonUseCase:
@@ -15,6 +16,6 @@ class GeneratePokemonUseCase:
                 self.__context = context
                 self.__color = color
 
-        def execute(self):
+        def execute(self) -> Pokemon:
                 """Execute the use case to generate a random Pokémon."""
                 return pokemon_generator.generate_random_pokemon(self.__context, self.__color)

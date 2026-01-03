@@ -31,7 +31,7 @@ class DiscordController:
                         """Print a message when bot is connected."""
                         logger.info("Connected")
 
-                @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
+                @commands.cooldown(1, 5, commands.BucketType.user)
                 @self.__bot.command(name="pokemon", help="Generates a random Pokémon")
                 async def pokemon(
                         ctx: commands.Context[typing.Any],
@@ -58,7 +58,7 @@ class DiscordController:
                                 create_trainer(ctx.author.name, str(ctx.author.id))
                         await ctx.send(message, embed=embed)
 
-                @commands.cooldown(1, 5, commands.BucketType.user)  # type: ignore
+                @commands.cooldown(1, 5, commands.BucketType.user)
                 @self.__bot.command(
                         name="dex",
                         help="List all Pokémon from user",
@@ -96,7 +96,7 @@ class DiscordController:
                                         f" {ctx.author.mention} This command is actually on cooldown, wait {round(error.retry_after, 2)} seconds.",
                                 )
 
-        def start(self, token):
+        def start(self, token: str) -> None:
                 """
                 Start the bot with the given token.
 

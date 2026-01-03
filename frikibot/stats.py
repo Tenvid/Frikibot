@@ -6,6 +6,7 @@ This module contains the definition for class Stats.
 
 import math
 from logging import getLogger
+from typing import Any
 
 logger = getLogger("Stats")
 
@@ -22,9 +23,9 @@ class Stats:
 
         def __init__(
                 self,
-                data: list[dict] | None,
-                decreased: dict | None = None,
-                increased: dict | None = None,
+                data: list[dict[str, Any]] | None,
+                decreased: str | None = None,
+                increased: str | None = None,
         ):
                 """
                 Pokémon stats constructor.
@@ -38,8 +39,8 @@ class Stats:
                     special_attack (int): Base special attack stat
                     special_defense (int): Base special defense stat
                     speed (int): Base speed stat
-                    decreased (dict | None, optional): Stat decreased by nature. Defaults to None.
-                    increased (dict | None, optional): Stat increased by nature. Defaults to None.
+                    decreased (str | None, optional): Stat decreased by nature. Defaults to None.
+                    increased (str | None, optional): Stat increased by nature. Defaults to None.
 
                 """
                 if data:
@@ -67,7 +68,7 @@ class Stats:
                 ret += "```"
                 return ret
 
-        def add_color_nature(self, stat_tuple: tuple[str, int]) -> str:
+        def add_color_nature(self, stat_tuple: tuple[str, int | None]) -> str:
                 """
                 Add color to stats.
 
@@ -85,13 +86,19 @@ class Stats:
                 logger.debug("Stat tuple: %s", stat_tuple)
 
                 if self.decreased and stat_tuple[0] == self.decreased:
-                        return f"\u001b[0;34m{stat_tuple[0].replace('-', ' ').capitalize()}: {math.floor(stat_tuple[1] * 0.9)}-\u001b[0;0m"
+                        return (
+                                f"\u001b[0;34m{stat_tuple[0].replace('-', ' ').capitalize()}:"
+                                f" {math.floor(stat_tuple[1] * 0.9) if stat_tuple[1] else 0}-\u001b[0;0m"
+                        )
                 if self.increased and stat_tuple[0] == self.increased:
-                        return f"\u001b[0;31m{stat_tuple[0].replace('-', ' ').capitalize()}:{math.floor(stat_tuple[1] * 1.1)}+\u001b[0;0m"
+                        return (
+                                f"\u001b[0;31m{stat_tuple[0].replace('-', ' ').capitalize()}:"
+                                f"{math.floor(stat_tuple[1] * 1.1) if stat_tuple[1] else 0}+\u001b[0;0m"
+                        )
 
-                return f"{stat_tuple[0].replace('-', ' ').capitalize()}: {stat_tuple[1]}"
+                return f"{stat_tuple[0].replace('-', ' ').capitalize()}: {stat_tuple[1] if stat_tuple[1] else 0}"
 
-        def get_stats_list(self) -> list:
+        def get_stats_list(self) -> list[tuple[str, int | None]]:
                 """
                 Generate a list of tuples with stat names and their values.
 

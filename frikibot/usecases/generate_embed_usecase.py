@@ -1,5 +1,7 @@
 """Usecase for generating Embed for Discord messages."""
 
+from discord import Embed
+
 from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
 from frikibot.pokemon import Pokemon
 
@@ -11,7 +13,7 @@ class GenerateEmbedUseCase:
                 """Initialize the use case with a pokemon."""
                 self.__pokemon = pokemon
 
-        def execute(self):
+        def execute(self) -> Embed:
                 """Execute the usecase."""
                 return (
                         DiscordEmbedBuilder()

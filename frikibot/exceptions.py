@@ -4,7 +4,7 @@
 class VarietyFetchError(Exception):
         """Raises when failing trying to fetch varieties of a Pokémon."""
 
-        def __init__(self, *args):
+        def __init__(self, *args: object):
                 """Init."""
                 super().__init__(*args)
 
@@ -12,7 +12,7 @@ class VarietyFetchError(Exception):
 class VarietyDetailsFetchError(Exception):
         """Raises when failing trying to fetch details of a variety."""
 
-        def __init__(self, *args):
+        def __init__(self, *args: object):
                 """Init."""
                 super().__init__(*args)
 
@@ -20,6 +20,6 @@ class VarietyDetailsFetchError(Exception):
 class NatureFetchError(Exception):
         """Raises when failing trying to fetch nature data."""
 
-        def __init__(self, *args):
+        def __init__(self, *args: object):
                 """Init."""
                 super().__init__(*args)

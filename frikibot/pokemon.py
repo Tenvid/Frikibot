@@ -6,6 +6,7 @@ This module contains a class for Pokémon entities
 
 from logging import getLogger
 from secrets import randbelow
+from typing import Any
 
 from frikibot.entities.nature import Nature
 from frikibot.stats import Stats
@@ -25,8 +26,8 @@ class Pokemon:
                 first_type: str,
                 second_type: str | None,
                 author_code: str,
-                available_abilities: list[dict],
-                available_moves: list[dict],
+                available_abilities: list[dict[str, Any]],
+                available_moves: list[dict[str, Any]],
                 stats: Stats,
                 sprite: str | None,
         ):
@@ -77,7 +78,7 @@ class Pokemon:
 
                 self.stats = stats
 
-        def _get_pokemon_moves(self, available_moves: list[dict]) -> list[str]:
+        def _get_pokemon_moves(self, available_moves: list[dict[str, Any]]) -> list[str]:
                 """
                 Generate four random moves from the possible ones of the Pokémon to learn.
 
@@ -90,7 +91,7 @@ class Pokemon:
                     List[str]: List of Pokémon moves
 
                 """
-                ret: list = []
+                ret: list[str] = []
                 while len(ret) < 4:
                         move = available_moves[randbelow(len(available_moves))]["move"]["name"]
 
@@ -98,7 +99,7 @@ class Pokemon:
                                 ret.append(move)
                 return ret
 
-        def _get_random_ability(self, abilities_list) -> dict:
+        def _get_random_ability(self, abilities_list: list[dict[str, Any]]) -> str:
                 """
                 Pick a random ability from the availables.
 
@@ -111,4 +112,5 @@ class Pokemon:
                     dict: Chosen ability
 
                 """
-                return abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
+                ability: str = abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
+                return ability

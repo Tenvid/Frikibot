@@ -1,6 +1,7 @@
 """Representation of variety details."""
 
 import logging
+from typing import Any
 
 from frikibot.entities.variety import Variety
 
@@ -15,11 +16,11 @@ class VarietyDetails(Variety):
                 is_default: bool,  # noqa: FBT001
                 name: str,
                 url: str,
-                available_abilities: list[dict],
-                available_moves: list[dict],
-                combat_stats: list[dict],
-                types: list[dict],
-                available_sprites: dict,
+                available_abilities: list[dict[str, Any]],
+                available_moves: list[dict[str, Any]],
+                combat_stats: list[dict[str, Any]],
+                types: list[dict[str, Any]],
+                available_sprites: dict[str, Any],
         ):
                 """
                 Initialize a VarietyDetails instance.
@@ -44,70 +45,70 @@ class VarietyDetails(Variety):
                 self.__available_sprites = available_sprites
 
         @property
-        def available_abilities(self):
+        def available_abilities(self) -> list[dict[str, Any]]:
                 """Return the available abilities."""
                 return self.__available_abilities
 
         @available_abilities.setter
-        def available_abilities(self, value: list[dict]):
+        def available_abilities(self, value: list[dict[str, Any]]) -> None:
                 """Set a new value for available_abilities."""
                 if not isinstance(value, list):
                         raise TypeError(f"Entered value: {value} is not valid for available_abilities")
                 self.__available_abilities = value
 
         @property
-        def available_moves(self):
+        def available_moves(self) -> list[dict[str, Any]]:
                 """Return the available moves."""
                 return self.__available_moves
 
         @available_moves.setter
-        def available_moves(self, value: list[dict]):
+        def available_moves(self, value: list[dict[str, Any]]) -> None:
                 """Set a new value for available_moves."""
                 if not isinstance(value, list):
                         raise TypeError(f"Entered value: {value} is not valid for available_moves")
                 self.__available_moves = value
 
         @property
-        def combat_stats(self):
+        def combat_stats(self) -> list[dict[str, Any]]:
                 """Return the combat stats."""
                 return self.__combat_stats
 
         @combat_stats.setter
-        def combat_stats(self, value: list[dict]):
+        def combat_stats(self, value: list[dict[str, Any]]) -> None:
                 """Set a new value for combat_stats."""
                 if not isinstance(value, list):
                         raise TypeError(f"Entered value: {value} is not valid for combat_stats")
                 self.__combat_stats = value
 
         @property
-        def types(self):
+        def types(self) -> list[dict[str, Any]]:
                 """Return the types."""
                 return self.__types
 
         @types.setter
-        def types(self, value: list[dict]):
+        def types(self, value: list[dict[str, Any]]) -> None:
                 """Set a new value for types."""
                 if not isinstance(value, list):
                         raise TypeError(f"Entered value: {value} is not valid for types")
                 self.__types = value
 
         @property
-        def available_sprites(self):
+        def available_sprites(self) -> dict[str, Any]:
                 """Return the available sprites."""
                 return self.__available_sprites
 
         @available_sprites.setter
-        def available_sprites(self, value: dict):
+        def available_sprites(self, value: dict[str, Any]) -> None:
                 """Set a new value for available_sprites."""
                 if not isinstance(value, dict):
                         raise TypeError(f"Entered value: {value} is not valid for available_sprites")
                 self.__available_sprites = value
 
         @classmethod
-        def from_json(cls, json_data: dict):
+        def from_json(cls, json_data: dict[str, Any]) -> "VarietyDetails":
                 """Create a VarietyDetails instance from JSON data."""
                 is_default = json_data.get("is_default", False)
-                name = json_data.get("name")
+                name = json_data.get("name") or "NONAME"
                 url = json_data.get("species", {}).get("url", "")
                 available_abilities = json_data.get("abilities", [])
                 available_moves = json_data.get("moves", [])

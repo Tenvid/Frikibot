@@ -1,12 +1,18 @@
 """SQLAlchemy database configuration module."""
 
 import logging
+from typing import TYPE_CHECKING
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from frikibot.shared.constants import DATABASE
+from frikibot.shared.constants import DATABASE  # type: ignore[import-untyped]
+
+if TYPE_CHECKING:
+        from collections.abc import Generator
+
+        from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +29,7 @@ Base = declarative_base()
 _db_initialized = True
 
 
-def initialize_database():
+def initialize_database() -> None:
         """
         Initialize the database schema.
 
@@ -48,7 +54,7 @@ def initialize_database():
                 logger.debug("Database already initialized")
 
 
-def get_db():
+def get_db() -> "Generator[Session, None, None]":
         """
         Get a database session.
 

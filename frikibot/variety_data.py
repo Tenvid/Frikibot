@@ -6,6 +6,7 @@ This module contains the defition for the class VarietyData.
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 logger = logging.getLogger("VarietyData")
 
@@ -14,12 +15,12 @@ logger = logging.getLogger("VarietyData")
 class VarietyData:
         """Variety representation."""
 
-        available_abilities: list[dict]
-        available_moves: list[dict]
+        available_abilities: list[dict[str, Any]]
+        available_moves: list[dict[str, Any]]
         name: str
-        combat_stats: list[dict]
-        types: list[dict]
-        available_sprites: dict
+        combat_stats: list[dict[str, Any]]
+        types: list[dict[str, Any]]
+        available_sprites: dict[str, Any]
 
         def get_official_artwork_sprite(self, color: str) -> str | None:
                 """

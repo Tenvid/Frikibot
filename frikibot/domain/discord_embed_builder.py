@@ -6,7 +6,7 @@ from discord import Embed
 class DiscordEmbedBuilder:
         """Builder for Discord Embed objects."""
 
-        def __init__(self):
+        def __init__(self) -> None:
                 """Initialize the DiscordEmbedBuilder."""
                 self.__embed = Embed()
 
@@ -20,7 +20,7 @@ class DiscordEmbedBuilder:
                 self.__embed.description = description
                 return self
 
-        def with_image(self, url: str) -> "DiscordEmbedBuilder":
+        def with_image(self, url: str | None) -> "DiscordEmbedBuilder":
                 """Set the image of the embed."""
                 self.__embed.set_image(url=url)
                 return self

@@ -40,7 +40,7 @@ pokeapi_controller = PokeAPIController()
 def generate_random_pokemon(
         ctx: commands.Context[Any],
         color: str,
-):
+) -> Pokemon:
         """
         Generate a random Pokémon and return a message with an embed object.
 

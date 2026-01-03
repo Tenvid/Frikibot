@@ -14,9 +14,6 @@ from frikibot.global_variables import TIMEOUT
 class PokeAPIController:
         """Controller for handling PokeAPI interactions."""
 
-        def __init__(self):
-                """Initialize the PokeAPIController."""
-
         def fetch_pokemon_varieties(self, pokemon_index: int) -> list[Variety]:
                 """Get all varieties of a Pokémon given its index."""
                 try:

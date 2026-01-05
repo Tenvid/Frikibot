@@ -9,7 +9,7 @@ from secrets import randbelow
 from typing import Any
 
 from frikibot.entities.nature import Nature
-from frikibot.stats import Stats
+from frikibot.entities.stats import Stats
 
 logger = getLogger("Pokemon")
 

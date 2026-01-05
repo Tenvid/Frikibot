@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock
 
 from frikibot.entities.nature import Nature
+from frikibot.entities.stats import Stats
 from frikibot.pokemon import Pokemon
-from frikibot.stats import Stats
 from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 
 
@@ -12,13 +12,11 @@ class PokemonBuilder:
     def __init__(self) -> None:
         self.name = "Example"
         self.list_index = -1
-        self.nature = Nature.from_json(
-            {
-                "name": "none",
-                "decreased_stat": None,
-                "increased_stat": None,
-            }
-        )
+        self.nature = Nature.from_json({
+            "name": "none",
+            "decreased_stat": None,
+            "increased_stat": None,
+        })
         self.first_type = "water"
         self.second_type = None
         self.author_code = "some_code"
@@ -113,13 +111,11 @@ def test_get_stats_string_with_non_neutral_nature():
     fake_pokemon = (
         PokemonBuilder()
         .with_nature(
-            Nature.from_json(
-                {
-                    "name": "impish",
-                    "increased_stat": {"name": "defense"},
-                    "decreased_stat": {"name": "special-attack"},
-                }
-            )
+            Nature.from_json({
+                "name": "impish",
+                "increased_stat": {"name": "defense"},
+                "decreased_stat": {"name": "special-attack"},
+            })
         )
         .build()
     )
@@ -140,16 +136,14 @@ def test_get_pokemon_stats():
     fake_pokemon = (
         PokemonBuilder()
         .with_stats(
-            Stats(
-                [
-                    {"base_stat": 70},
-                    {"base_stat": 110},
-                    {"base_stat": 70},
-                    {"base_stat": 115},
-                    {"base_stat": 70},
-                    {"base_stat": 90},
-                ]
-            )
+            Stats([
+                {"base_stat": 70},
+                {"base_stat": 110},
+                {"base_stat": 70},
+                {"base_stat": 115},
+                {"base_stat": 70},
+                {"base_stat": 90},
+            ])
         )
         .build()
     )

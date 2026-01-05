@@ -10,9 +10,9 @@ from sqlalchemy.orm import sessionmaker
 from frikibot.shared.constants import DATABASE  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
-        from collections.abc import Generator
+    from collections.abc import Generator
 
-        from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -30,42 +30,41 @@ _db_initialized = True
 
 
 def initialize_database() -> None:
-        """
-        Initialize the database schema.
+    """
+    Initialize the database schema.
 
-        This function should be called once when the application starts.
-        It ensures all tables defined in the models are created in the database.
+    This function should be called once when the application starts.
+    It ensures all tables defined in the models are created in the database.
 
-        """
-        global _db_initialized
+    """
+    global _db_initialized
 
-        if not _db_initialized:
-                # Import here to avoid circular imports
-                # The models module imports Base from this module
+    if not _db_initialized:
+        # Import here to avoid circular imports
+        # The models module imports Base from this module
 
-                logger.info("Initializing database schema")
+        logger.info("Initializing database schema")
 
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database schema initialized")
 
-                Base.metadata.create_all(bind=engine)
-                logger.info("Database schema initialized")
-
-                _db_initialized = True
-        else:
-                logger.debug("Database already initialized")
+        _db_initialized = True
+    else:
+        logger.debug("Database already initialized")
 
 
 def get_db() -> "Generator[Session, None, None]":
-        """
-        Get a database session.
+    """
+    Get a database session.
 
-        Yields
-        ------
-        Session
-            A SQLAlchemy session
+    Yields
+    ------
+    Session
+        A SQLAlchemy session
 
-        """
-        db = SessionLocal()
-        try:
-                yield db
-        finally:
-                db.close()
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

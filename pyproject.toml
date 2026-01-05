@@ -36,7 +36,7 @@ poetry-plugin-export = ">=1.8"
 
 [tool.ruff]
 line-length = 160
-indent-width = 8
+indent-width = 4
 # exclude = ["tests"]
 target-version = "py311"
 

@@ -6,7 +6,7 @@ import pytest
 
 from frikibot.controller.pokeapi_controller import PokeAPIController
 from frikibot.entities.variety import Variety
-from frikibot.exceptions import VarietyDetailsFetchError, VarietyFetchError
+from frikibot.shared.exceptions import VarietyDetailsFetchError, VarietyFetchError
 
 
 @pytest.fixture()

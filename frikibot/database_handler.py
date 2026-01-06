@@ -13,7 +13,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 
-from frikibot.pokemon import Pokemon
+from frikibot.entities.pokemon import Pokemon
 
 load_dotenv()
 logger = getLogger("DB-Handler")

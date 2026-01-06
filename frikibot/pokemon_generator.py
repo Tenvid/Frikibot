@@ -13,8 +13,8 @@ from typing import Any
 from discord.ext import commands
 
 from frikibot.controller.pokeapi_controller import PokeAPIController
+from frikibot.entities.pokemon import Pokemon
 from frikibot.entities.stats import Stats
-from frikibot.pokemon import Pokemon
 from frikibot.shared.global_variables import MAX_INDEX
 
 

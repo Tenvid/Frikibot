@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock
 
 from frikibot.entities.nature import Nature
+from frikibot.entities.pokemon import Pokemon
 from frikibot.entities.stats import Stats
-from frikibot.pokemon import Pokemon
 from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 
 

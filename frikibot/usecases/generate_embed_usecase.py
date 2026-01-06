@@ -3,7 +3,7 @@
 from discord import Embed
 
 from frikibot.domain.discord_embed_builder import DiscordEmbedBuilder
-from frikibot.pokemon import Pokemon
+from frikibot.entities.pokemon import Pokemon
 
 
 class GenerateEmbedUseCase:

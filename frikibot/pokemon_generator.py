@@ -14,8 +14,8 @@ from discord.ext import commands
 
 from frikibot.controller.pokeapi_controller import PokeAPIController
 from frikibot.entities.stats import Stats
-from frikibot.global_variables import MAX_INDEX
 from frikibot.pokemon import Pokemon
+from frikibot.shared.global_variables import MAX_INDEX
 
 
 class RequestTypes(enum.StrEnum):

@@ -8,7 +8,7 @@ from frikibot.entities.nature import Nature
 from frikibot.entities.variety import Variety
 from frikibot.entities.variety_details import VarietyDetails
 from frikibot.exceptions import NatureFetchError, VarietyDetailsFetchError, VarietyFetchError
-from frikibot.global_variables import TIMEOUT
+from frikibot.shared.global_variables import TIMEOUT
 
 
 class PokeAPIController:

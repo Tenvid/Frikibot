@@ -98,9 +98,9 @@ def test_fetch_variety_details_success(mock_get, controller, mock_variety, mock_
 @patch("requests.get")
 def test_fetch_variety_details_connection_error(mock_get, controller, mock_variety):
     """Test that VarietyDetailsFetchError is raised on ConnectionError."""
-    from requests.exceptions import ConnectionError
+    from requests import exceptions
 
-    mock_get.side_effect = ConnectionError("ConnectionError")
+    mock_get.side_effect = exceptions.ConnectionError("ConnectionError")
 
     with pytest.raises(VarietyDetailsFetchError) as exc_info:
         controller.fetch_variety_details(mock_variety)

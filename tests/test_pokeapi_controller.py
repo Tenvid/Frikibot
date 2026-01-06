@@ -9,13 +9,13 @@ from frikibot.entities.variety import Variety
 from frikibot.shared.exceptions import VarietyDetailsFetchError, VarietyFetchError
 
 
-@pytest.fixture()
+@pytest.fixture
 def controller():
     """Fixture to create a PokeAPIController instance."""
     return PokeAPIController()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_variety():
     """Fixture to create a mock Variety object."""
     variety = Mock(spec=Variety)
@@ -23,7 +23,7 @@ def mock_variety():
     return variety
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_detailed_variety_response():
     return {
         "is_default": True,

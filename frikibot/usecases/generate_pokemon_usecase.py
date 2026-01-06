@@ -5,7 +5,7 @@ import typing
 from discord.ext import commands
 
 from frikibot import pokemon_generator
-from frikibot.pokemon import Pokemon
+from frikibot.entities.pokemon import Pokemon
 
 
 class GeneratePokemonUseCase:

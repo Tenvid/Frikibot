@@ -11,7 +11,7 @@ from frikibot.database_handler import (
     read_pokemon_by_trainer,
     read_trainer,
 )
-from frikibot.paginated_view import PaginatedView
+from frikibot.infrastructure.paginated_view import PaginatedView
 from frikibot.usecases.generate_embed_usecase import GenerateEmbedUseCase
 from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase

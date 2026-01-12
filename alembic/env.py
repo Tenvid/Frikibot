@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from frikibot.infrastructure import database
-from frikibot.db.models import pokemon
+from frikibot.db.models import pokemon, trainer
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

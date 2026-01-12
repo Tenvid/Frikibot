@@ -7,8 +7,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from frikibot.shared.constants import DATABASE  # type: ignore[import-untyped]
-
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -17,7 +15,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # Create the SQLAlchemy engine
-engine = create_engine(f"sqlite:///{DATABASE}")
+engine = create_engine("sqlite:///db/pokemon.db")
 
 # Create the session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

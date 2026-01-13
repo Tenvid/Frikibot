@@ -19,6 +19,7 @@ engine = create_engine("sqlite:///db/pokemon.db")
 
 # Create the session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SESSION = SessionLocal()
 
 # Base class for ORM models
 Base = declarative_base()

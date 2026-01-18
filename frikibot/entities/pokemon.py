@@ -8,6 +8,7 @@ from logging import getLogger
 from secrets import randbelow
 from typing import Any
 
+from frikibot.db.models import pokemon as pokemon_model
 from frikibot.entities.nature import Nature
 from frikibot.entities.stats import Stats
 
@@ -114,3 +115,24 @@ class Pokemon:
         """
         ability: str = abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
         return ability
+
+    def to_orm(self) -> pokemon_model.Pokemon:
+        """
+        Convert the Pokémon entity to its ORM representation.
+
+        Returns
+        -------
+            pokemon.Pokemon: ORM representation of the Pokémon
+
+        """
+        return pokemon_model.Pokemon(
+            name=self.name,
+            first_type=self.first_type,
+            second_type=self.second_type,
+            author_code=self.author_code,
+            move1=self.moves_list[0],
+            move2=self.moves_list[1],
+            move3=self.moves_list[2],
+            move4=self.moves_list[3],
+            nature_name=self.nature_name,
+        )

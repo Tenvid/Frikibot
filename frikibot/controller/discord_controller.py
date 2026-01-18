@@ -11,12 +11,16 @@ from frikibot.database_handler import (
     read_pokemon_by_trainer,
     read_trainer,
 )
+from frikibot.infrastructure.database import SessionLocal
 from frikibot.infrastructure.paginated_view import PaginatedView
+from frikibot.infrastructure.sqlalchemy_pokemon_repository import SQLAlchemyPokemonRepository
 from frikibot.usecases.generate_embed_usecase import GenerateEmbedUseCase
 from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase
 
 logger = logging.getLogger(__name__)
+
+pokemon_repository = SQLAlchemyPokemonRepository(SessionLocal())
 
 
 class DiscordController:
@@ -56,6 +60,8 @@ class DiscordController:
             if not read_trainer(str(ctx.author.id)):
                 logger.info("Trainer added")
                 create_trainer(ctx.author.name, str(ctx.author.id))
+
+            pokemon_repository.add(pokemon.to_orm())
             await ctx.send(message, embed=embed)
 
         @commands.cooldown(1, 5, commands.BucketType.user)

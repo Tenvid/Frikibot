@@ -19,7 +19,7 @@ class PokemonRepository(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_all_by_trainer(self, trainer_id: int) -> list[pokemon.Pokemon]:  # noqa
+    def get_all_by_trainer(self, trainer_code: str) -> list[pokemon.Pokemon]:  # noqa
         """
         Get all Pokemons for a specific trainer.
 

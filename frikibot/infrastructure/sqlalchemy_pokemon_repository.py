@@ -28,15 +28,19 @@ class SQLAlchemyPokemonRepository(pokemon_repository.PokemonRepository):
         except sqlalchemy.exc.SQLAlchemyError:
             self.session.rollback()
 
-    def get_all_by_trainer(self, trainer_id: int) -> list[pokemon.Pokemon]:
+    def get_all_by_trainer(self, trainer_code: str) -> list[pokemon.Pokemon]:
         """
         Get all Pokemons for a specific trainer.
 
         Args:
-            trainer_id (int): The ID of the trainer.
+            trainer_code (str): The unique code of the trainer.
 
         Returns:
             list[pokemon.Pokemon]: A list of Pokemons owned by the trainer.
 
         """
-        return self.session.query(pokemon.Pokemon).filter(pokemon.Pokemon.trainer_id == trainer_id).all()
+        try:
+            return self.session.query(pokemon.Pokemon).filter(pokemon.Pokemon.author_code == trainer_code).all()
+        except sqlalchemy.exc.SQLAlchemyError:
+            self.session.rollback()
+            return []

@@ -32,10 +32,10 @@ class SQLAlchemyTrainerRepository(TrainerRepository):
         Get a Trainer by their ID.
 
         Args:
-            trainer_code (str): The Trainer's code.
+            trainer_code (str): The Trainer's unique code.
 
         Returns:
             trainer_repository.Trainer | None: The Trainer if found, else None.
 
         """
-        return self.session.query(Trainer).filter_by(code=trainer_code).first()
+        return self.session.query(Trainer).filter_by(trainer_code=trainer_code).first()

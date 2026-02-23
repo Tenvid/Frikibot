@@ -21,6 +21,7 @@ pokemon_repository = SQLAlchemyPokemonRepository(SessionLocal())
 trainer_repository = SQLAlchemyTrainerRepository(SessionLocal())
 
 
+# ???: Is necessary to have a class?
 class DiscordController:
     """Controller to route Discord commands."""
 
@@ -56,13 +57,14 @@ class DiscordController:
             logger.info("Message created")
 
             if not trainer_repository.get_by_code(str(ctx.author.id)):
-                logger.info("Trainer added")
+                # TODO: This method should not receive a Trainer object, it should receive the code and name and create the object inside the method.
                 trainer_repository.add(
                     Trainer(
                         trainer_name=ctx.author.name,
                         trainer_code=str(ctx.author.id),
                     )
                 )
+                logger.info("Trainer added")
 
             pokemon_repository.add(pokemon.to_orm())
             await ctx.send(message, embed=embed)

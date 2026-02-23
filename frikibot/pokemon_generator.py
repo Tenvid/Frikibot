@@ -34,6 +34,7 @@ class RequestTypes(enum.StrEnum):
 
 logger = logging.getLogger(name="PkGenerator")
 
+# TODO: Apply DI
 pokeapi_controller = PokeAPIController()
 
 
@@ -65,8 +66,10 @@ def generate_random_pokemon(
 
     logger.info("Nature created: %s", nature)
 
+    # IDEA: Extract the creation to a Factory Method
     pokemon_stats = Stats(detailed_variety.combat_stats, nature.decreased, nature.increased)
 
+    # TODO: Extract the creation of the Pokémon to a Factory Method/Builder
     return Pokemon(
         name=detailed_variety.name,
         list_index=pokemon_index,

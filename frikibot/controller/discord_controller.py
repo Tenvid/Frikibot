@@ -6,14 +6,11 @@ import typing
 
 from discord.ext import commands
 
-from frikibot.database_handler import (
-    create_trainer,
-    read_pokemon_by_trainer,
-    read_trainer,
-)
+from frikibot.db.models.trainer import Trainer
 from frikibot.infrastructure.database import SessionLocal
 from frikibot.infrastructure.paginated_view import PaginatedView
 from frikibot.infrastructure.sqlalchemy_pokemon_repository import SQLAlchemyPokemonRepository
+from frikibot.infrastructure.sqlalchemy_trainer_repository import SQLAlchemyTrainerRepository
 from frikibot.usecases.generate_embed_usecase import GenerateEmbedUseCase
 from frikibot.usecases.generate_message_usecase import GenerateMessageUseCase
 from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase
@@ -21,6 +18,7 @@ from frikibot.usecases.generate_pokemon_usecase import GeneratePokemonUseCase
 logger = logging.getLogger(__name__)
 
 pokemon_repository = SQLAlchemyPokemonRepository(SessionLocal())
+trainer_repository = SQLAlchemyTrainerRepository(SessionLocal())
 
 
 class DiscordController:
@@ -57,9 +55,14 @@ class DiscordController:
             message = GenerateMessageUseCase(ctx, color).execute()
             logger.info("Message created")
 
-            if not read_trainer(str(ctx.author.id)):
+            if not trainer_repository.get_by_code(str(ctx.author.id)):
                 logger.info("Trainer added")
-                create_trainer(ctx.author.name, str(ctx.author.id))
+                trainer_repository.add(
+                    Trainer(
+                        trainer_name=ctx.author.name,
+                        trainer_code=str(ctx.author.id),
+                    )
+                )
 
             pokemon_repository.add(pokemon.to_orm())
             await ctx.send(message, embed=embed)
@@ -79,7 +82,7 @@ class DiscordController:
 
             """
             view = PaginatedView()
-            view.data = read_pokemon_by_trainer(str(ctx.author.id))
+            view.data = pokemon_repository.get_all_by_trainer(str(ctx.author.id))
             view.user = ctx.author.name
             await view.send(ctx)
 

@@ -6,21 +6,22 @@ This module defines Paginated View for Discord Message.
 
 import math
 import typing
-from typing import Any
 
 import discord
 from discord.ext import commands
+
+from frikibot.db.models.pokemon import Pokemon
 
 
 class PaginatedView(discord.ui.View):
     """Definition of paginated view."""
 
-    data: list[Any]
+    data: list[Pokemon]
     current_page: int = 1
     separator: int = 5
     user: str = "User"
 
-    def create_embed(self, data: list[tuple[Any, ...]]) -> discord.Embed:
+    def create_embed(self, data: list[Pokemon]) -> discord.Embed:
         """
         Generate list page.
 
@@ -36,9 +37,10 @@ class PaginatedView(discord.ui.View):
         embed = discord.Embed(title=f"{self.user.capitalize()} Pokémon list")
         for elem in data:
             embed.add_field(
-                name=elem[1].replace("-", " ").capitalize(),
-                value="\n".join([x.replace("-", " ").capitalize() for x in elem[5:9]]),
+                name=elem.name.replace("-", " ").capitalize(),
+                value="\n".join([x.replace("-", " ").capitalize() for x in [elem.move1, elem.move2, elem.move3, elem.move4]]),
             )
+            # TODO: This function should not use the Pokémon Model from the Database.
 
         return embed
 
@@ -54,7 +56,7 @@ class PaginatedView(discord.ui.View):
         self.message = await ctx.send(view=self)
         await self.update_message(self.data[: self.separator])
 
-    async def update_message(self, data: list[Any]) -> None:
+    async def update_message(self, data: list[Pokemon]) -> None:
         """
         Change page information when a button is pressed.
 

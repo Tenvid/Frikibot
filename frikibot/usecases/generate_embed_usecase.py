@@ -43,13 +43,7 @@ class GenerateEmbedUseCase:
         """
         moves_list = [move.replace("-", " ").capitalize() for move in moves_list]
         ret = "```\n"
-
-        for move in moves_list:
-            ret += f"{move}"
-            if move == moves_list[-1]:
-                break
-            ret += "\n"
-
+        ret += "\n".join(moves_list)
         ret += "```"
 
         return ret

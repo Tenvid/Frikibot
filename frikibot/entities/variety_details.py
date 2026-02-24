@@ -112,9 +112,9 @@ class VarietyDetails(Variety):
         url = json_data.get("species", {}).get("url", "")
         available_abilities = json_data.get("abilities", [])
         available_moves = json_data.get("moves", [])
-        combat_stats = json_data.get("stats", {})
+        combat_stats = json_data.get("stats", [])
         types = json_data.get("types", [])
-        available_sprites = json_data.get("sprites", [])
+        available_sprites = json_data.get("sprites", {})
         return cls(
             is_default=is_default,
             name=name,

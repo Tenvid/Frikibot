@@ -6,6 +6,7 @@ This module contains the commands available in the Frikibot.
 
 import logging
 import os
+import sys
 
 import discord
 from discord.ext import commands
@@ -17,7 +18,7 @@ load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 if not TOKEN:
-    exit(1)
+    sys.exit("Error: DISCORD_TOKEN environment variable not found. Please set it in the .env file.")
 
 bot = commands.Bot(command_prefix="-", intents=discord.flags.Intents().all())
 

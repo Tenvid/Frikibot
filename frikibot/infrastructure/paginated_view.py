@@ -10,16 +10,18 @@ import typing
 import discord
 from discord.ext import commands
 
+from frikibot.db.models.pokemon import Pokemon
+
 
 class PaginatedView(discord.ui.View):
     """Definition of paginated view."""
 
-    data: list
+    data: list[Pokemon]
     current_page: int = 1
     separator: int = 5
     user: str = "User"
 
-    def create_embed(self, data: list[tuple]) -> discord.Embed:
+    def create_embed(self, data: list[Pokemon]) -> discord.Embed:
         """
         Generate list page.
 
@@ -35,9 +37,10 @@ class PaginatedView(discord.ui.View):
         embed = discord.Embed(title=f"{self.user.capitalize()} Pokémon list")
         for elem in data:
             embed.add_field(
-                name=elem[1].replace("-", " ").capitalize(),
-                value="\n".join([x.replace("-", " ").capitalize() for x in elem[5:9]]),
+                name=elem.name.replace("-", " ").capitalize(),
+                value="\n".join([x.replace("-", " ").capitalize() for x in [elem.move1, elem.move2, elem.move3, elem.move4]]),
             )
+            # TODO: This function should not use the Pokémon Model from the Database.
 
         return embed
 
@@ -53,7 +56,7 @@ class PaginatedView(discord.ui.View):
         self.message = await ctx.send(view=self)
         await self.update_message(self.data[: self.separator])
 
-    async def update_message(self, data: list) -> None:
+    async def update_message(self, data: list[Pokemon]) -> None:
         """
         Change page information when a button is pressed.
 
@@ -68,8 +71,8 @@ class PaginatedView(discord.ui.View):
     async def first_page_button(
         self,
         interaction: discord.Interaction,
-        button: discord.ui.Button,  # noqa
-    ):
+        button: discord.ui.Button[typing.Any],  # noqa
+    ) -> None:
         """
         Define button to return to first page.
 
@@ -89,8 +92,8 @@ class PaginatedView(discord.ui.View):
     async def previous_button(
         self,
         interaction: discord.Interaction,
-        button: discord.ui.Button,  # noqa
-    ):
+        button: discord.ui.Button[typing.Any],  # noqa
+    ) -> None:
         """
         Define button to go to previous page.
 
@@ -111,8 +114,8 @@ class PaginatedView(discord.ui.View):
     async def next_button(
         self,
         interaction: discord.Interaction,
-        button: discord.ui.Button,  # noqa
-    ):
+        button: discord.ui.Button[typing.Any],  # noqa
+    ) -> None:
         """
         Define button to go to next page.
 
@@ -136,8 +139,8 @@ class PaginatedView(discord.ui.View):
     async def last_page_button(
         self,
         interaction: discord.Interaction,
-        button: discord.ui.Button,  # noqa
-    ):
+        button: discord.ui.Button[typing.Any],  # noqa
+    ) -> None:
         """
         Define button to go to last page.
 

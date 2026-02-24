@@ -6,8 +6,11 @@ This module contains a class for Pokémon entities
 
 from logging import getLogger
 from secrets import randbelow
+from typing import Any
 
-from frikibot.stats import Stats
+from frikibot.db.models import pokemon as pokemon_model
+from frikibot.entities.nature import Nature
+from frikibot.entities.stats import Stats
 
 logger = getLogger("Pokemon")
 
@@ -20,13 +23,13 @@ class Pokemon:
         *,
         name: str,
         list_index: int,
-        nature: dict,
+        nature: Nature,
         first_type: str,
         second_type: str | None,
         author_code: str,
-        available_abilities: list[dict],
-        available_moves: list[dict],
-        stats_data: list[dict],
+        available_abilities: list[dict[str, Any]],
+        available_moves: list[dict[str, Any]],
+        stats: Stats,
         sprite: str | None,
     ):
         """
@@ -36,15 +39,14 @@ class Pokemon:
         ----
             name (str): Pokémon name
             list_index (int): Pokémon number in list
-            moves_list (list): List of movements
-            nature (str): Pokémon nature
+            nature (Nature): Pokémon nature
             first_type (str): Primary type
-            second_type (str): Secondary type if there is
+            second_type (str | None): Secondary type if there is
             author_code (str): Trainer id
-            available_moves: (list[dict]): Dict with moves info
-            stats_data: (list[dict]): List of Pokémon stats
-            available_abilities: (list[dict]): List of Pokémon available abilities
-            sprite (str|None): Url of the sprite
+            available_abilities (list[dict]): List of Pokémon available abilities
+            available_moves (list[dict]): List of available moves
+            stats (Stats): Pokémon stats
+            sprite (str | None): Url of the sprite
 
         """
         logger.debug("Pokemon initalization started.")
@@ -55,12 +57,13 @@ class Pokemon:
         self.nature = nature
         logger.debug("Pokemon nature set")
         try:
-            self.nature_name = nature["name"]
+            self.nature_name = nature.name
             logger.debug("Pokemon nature_name set")
         except KeyError:
             self.nature_name = "Unknown nature"
             logger.warning(
-                "Nature name could not be obtained from given nature: %s", nature
+                "Nature name could not be obtained from given nature: %s",
+                nature,
             )
         self.first_type = first_type
         logger.debug("Pokemon first_type set")
@@ -73,18 +76,10 @@ class Pokemon:
         self.ability = self._get_random_ability(available_abilities)
         logger.debug("Pokemon ability set")
         self.sprite = sprite
-        try:
-            self.stats = Stats(
-                stats_data, self.nature["decreased_stat"], self.nature["increased_stat"]
-            )
-            logger.debug("Pokemon stats set")
-        except KeyError:
-            self.stats = Stats(stats_data, None, None)
-            logger.warning(
-                "Modified stats could not be obtained from nature, defaulting to None."
-            )
 
-    def _get_pokemon_moves(self, available_moves: list[dict]) -> list[str]:
+        self.stats = stats
+
+    def _get_pokemon_moves(self, available_moves: list[dict[str, Any]]) -> list[str]:
         """
         Generate four random moves from the possible ones of the Pokémon to learn.
 
@@ -97,7 +92,7 @@ class Pokemon:
             List[str]: List of Pokémon moves
 
         """
-        ret: list = []
+        ret: list[str] = []
         while len(ret) < 4:
             move = available_moves[randbelow(len(available_moves))]["move"]["name"]
 
@@ -105,7 +100,7 @@ class Pokemon:
                 ret.append(move)
         return ret
 
-    def _get_random_ability(self, abilities_list) -> dict:
+    def _get_random_ability(self, abilities_list: list[dict[str, Any]]) -> str:
         """
         Pick a random ability from the availables.
 
@@ -118,4 +113,26 @@ class Pokemon:
             dict: Chosen ability
 
         """
-        return abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
+        ability: str = abilities_list[randbelow(len(abilities_list))]["ability"]["name"]
+        return ability
+
+    def to_orm(self) -> pokemon_model.Pokemon:
+        """
+        Convert the Pokémon entity to its ORM representation.
+
+        Returns
+        -------
+            pokemon.Pokemon: ORM representation of the Pokémon
+
+        """
+        return pokemon_model.Pokemon(
+            name=self.name,
+            first_type=self.first_type,
+            second_type=self.second_type,
+            author_code=self.author_code,
+            move1=self.moves_list[0],
+            move2=self.moves_list[1],
+            move3=self.moves_list[2],
+            move4=self.moves_list[3],
+            nature_name=self.nature_name,
+        )

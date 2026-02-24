@@ -19,6 +19,7 @@ class SQLAlchemyPokemonRepository(pokemon_repository.PokemonRepository):
         Add a Pokemon to the repository.
 
         Args:
+        ----
             pokemon (pokemon_repository.Pokemon): The Pokemon to add.
 
         """
@@ -33,9 +34,11 @@ class SQLAlchemyPokemonRepository(pokemon_repository.PokemonRepository):
         Get all Pokemons for a specific trainer.
 
         Args:
+        ----
             trainer_code (str): The unique code of the trainer.
 
         Returns:
+        -------
             list[pokemon.Pokemon]: A list of Pokemons owned by the trainer.
 
         """

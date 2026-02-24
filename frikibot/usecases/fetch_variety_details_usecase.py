@@ -16,9 +16,11 @@ class FetchVarietyDetailsUseCase:
         Execute the use case to fetch variety details.
 
         Args:
+        ----
             variety (Variety): The variety to fetch details for.
 
         Returns:
+        -------
             VarietyDetails: The details of the variety.
 
         """

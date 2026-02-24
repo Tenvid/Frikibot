@@ -18,6 +18,7 @@ class SQLAlchemyTrainerRepository(TrainerRepository):
         Add a Trainer to the repository.
 
         Args:
+        ----
             trainer (trainer_repository.Trainer): The Trainer to add.
 
         """
@@ -32,9 +33,11 @@ class SQLAlchemyTrainerRepository(TrainerRepository):
         Get a Trainer by their ID.
 
         Args:
+        ----
             trainer_code (str): The Trainer's unique code.
 
         Returns:
+        -------
             trainer_repository.Trainer | None: The Trainer if found, else None.
 
         """

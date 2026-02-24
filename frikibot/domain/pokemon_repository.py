@@ -14,6 +14,7 @@ class PokemonRepository(abc.ABC):
         Add a Pokemon to the repository.
 
         Args:
+        ----
             pokemon (pokemon.Pokemon): The Pokemon to add.
 
         """
@@ -24,9 +25,11 @@ class PokemonRepository(abc.ABC):
         Get all Pokemons for a specific trainer.
 
         Args:
+        ----
             trainer_id (int): The ID of the trainer.
 
         Returns:
+        -------
             list[pokemon.Pokemon]: A list of Pokemons owned by the trainer.
 
         """

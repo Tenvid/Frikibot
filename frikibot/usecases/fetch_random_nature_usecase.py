@@ -14,7 +14,7 @@ class FetchRandomNatureUseCase:
 
     def execute(self):
         """Execute the use case to fetch a random nature."""
-        nature_index = random.randint(0, 25 - 1)  # TODO: Max index should be retrieved from api  # noqa: S311
+        nature_index = random.randint(1, 25 - 1)  # TODO: Max index should be retrieved from api  # noqa: S311
         try:
             response = requests.get(f"https://pokeapi.co/api/v2/nature/{nature_index}", timeout=TIMEOUT)
             if response.status_code == 200:

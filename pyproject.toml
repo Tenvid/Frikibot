@@ -105,6 +105,7 @@ ignore = [
   "COM812", # Conflict with ISC001 | Checks for absensce of trailing commas
   "TD002",
   "TD003",
+  "PT001",
 ]
 
 [tool.pytest.ini_options]
